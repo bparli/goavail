@@ -27,6 +27,6 @@ func main() {
 
 	}
 
-	log.Debugln(config.Addresses)
+	log.Debugln(config)
 	monitor.StartPingMon(dnsConfig, config.Threshold)
 }

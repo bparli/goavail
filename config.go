@@ -10,7 +10,7 @@ type Config struct {
 	Threshold int      `toml:"failure_threshold"`
 	DnsDomain string   `toml:"dns_domain"`
 	HostNames []string `toml:"hostnames"`
-	Proxied   bool     `toml:"proxied"`
+	Proxied   bool     `toml:"dns_proxied"`
 }
 
 func parseConfig(path string) Config {

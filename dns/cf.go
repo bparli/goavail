@@ -35,6 +35,7 @@ func (r *CFlare) AddIP(ipAddress string) error {
 
 func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	// Construct a new API object
+	log.Infoln("Adding ", name, ipAddress, " to Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
 		log.Errorln(err)
@@ -50,7 +51,7 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 
 	params := &cloudflare.DNSRecord{
 		Type:     "A",
-		Name:     name,
+		Name:     r.formatHostname(name),
 		ZoneID:   zoneId,
 		ZoneName: r.DnsDomain,
 		Content:  ipAddress,
@@ -79,6 +80,7 @@ func (r *CFlare) RemoveIP(ipAddress string) error {
 
 func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 	// Construct a new API object
+	log.Infoln("Deleting ", name, ipAddress, " from Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
 		log.Errorln(err)
@@ -91,10 +93,10 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 		log.Errorln(err)
 		return err
 	}
-
+	log.Debugln(r.Proxied, ipAddress, r.DnsDomain, zoneId, r.formatHostname(name))
 	params := &cloudflare.DNSRecord{
 		Type:     "A",
-		Name:     name,
+		Name:     r.formatHostname(name),
 		ZoneID:   zoneId,
 		ZoneName: r.DnsDomain,
 		Content:  ipAddress,
