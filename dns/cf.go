@@ -37,14 +37,12 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	log.Infoln("Adding", name, ipAddress, "to Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 
 	// Fetch the zone ID
 	zoneId, err := api.ZoneIDByName(r.DnsDomain) // Assumes exists CloudFlare already
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 
@@ -59,7 +57,6 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 
 	dnsRec, err := api.DNSRecords(zoneId, *params)
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 	if len(dnsRec) == 1 {
@@ -69,7 +66,6 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 
 	resp, err := api.CreateDNSRecord(zoneId, *params)
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 	log.Debugln("CF response", resp)
@@ -92,14 +88,12 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 	log.Infoln("Deleting", name, ipAddress, "from Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 
 	// Fetch the zone ID
 	zoneId, err := api.ZoneIDByName(r.DnsDomain) // Assumes exists in CloudFlare already
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 	log.Debugln(r.Proxied, ipAddress, r.DnsDomain, zoneId, r.formatHostname(name))
@@ -114,7 +108,6 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 
 	dnsRec, err := api.DNSRecords(zoneId, *params)
 	if err != nil {
-		log.Errorln(err)
 		return err
 	}
 
@@ -127,8 +120,6 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 
 	err = api.DeleteDNSRecord(zoneId, dnsRec[0].ID)
 	if err != nil {
-		log.Debug(err.Error())
-		log.Errorln(err)
 		return err
 	}
 	return nil

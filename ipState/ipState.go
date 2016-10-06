@@ -67,9 +67,10 @@ func notifyPeers(ipAddress string, live bool) error {
 
 func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 	Gm.Mutex.RLock()
-	check := Gm.IpLive[ipAddress]
-	Gm.Mutex.RUnlock()
-	if check == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
+	//check := Gm.IpLive[ipAddress]
+	//Gm.Mutex.RUnlock()
+	if Gm.IpLive[ipAddress] == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
+		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Removing IP")
 		if live == false {
 			err := master.dns.RemoveIP(ipAddress)
@@ -83,6 +84,7 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 			}
 		}
 	} else { //we haven't received a message from a peer yet so just update the state and notify peers
+		Gm.Mutex.RUnlock()
 		Gm.Mutex.Lock()
 		Gm.IpLive[ipAddress] = live
 		Gm.Mutex.Unlock()
