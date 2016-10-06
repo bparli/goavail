@@ -83,7 +83,7 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
 		}
-	} else { //we haven't received a message from a peer yet so just update the state and notify peers
+	} else if peerUpdate == false { //we haven't received a message from a peer yet so just update the state and notify peers
 		Gm.Mutex.RUnlock()
 		Gm.Mutex.Lock()
 		Gm.IpLive[ipAddress] = live

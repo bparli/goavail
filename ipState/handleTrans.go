@@ -9,6 +9,7 @@ func handleTansition(ipAddress string, live bool) {
 			log.Errorln("Error Updating state: ", ipAddress, err)
 		}
 	} else {
+		log.Debugln("Running in single mode, updating DNS")
 		if live == true {
 			err := master.dns.AddIP(ipAddress)
 			if err != nil {
