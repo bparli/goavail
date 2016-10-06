@@ -11,12 +11,12 @@ func handleTansition(ipAddress string, live bool) {
 	} else {
 		log.Debugln("Running in single mode, updating DNS")
 		if live == true {
-			err := master.dns.AddIP(ipAddress)
+			err := Master.Dns.AddIP(ipAddress)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
 		} else {
-			err := master.dns.RemoveIP(ipAddress)
+			err := Master.Dns.RemoveIP(ipAddress)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}

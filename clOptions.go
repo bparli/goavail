@@ -8,10 +8,6 @@ import (
 type GoavailOpts struct {
 	Command    *string
 	ConfigFile *string
-	IP         *string
-	Listen     *string
-	Join       *string
-	Raft       *string
 }
 
 func parseCommandLine() *GoavailOpts {

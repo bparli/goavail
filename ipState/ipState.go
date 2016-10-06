@@ -28,8 +28,6 @@ type HttpUpdate struct {
 
 var Gm *GlobalMap
 
-var Mutex *sync.RWMutex
-
 func InitGM(ipAddresses []string) {
 	m := make(map[string]bool)
 	for _, ip := range ipAddresses {
@@ -67,18 +65,16 @@ func notifyPeers(ipAddress string, live bool) error {
 
 func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 	Gm.Mutex.RLock()
-	//check := Gm.IpLive[ipAddress]
-	//Gm.Mutex.RUnlock()
 	if Gm.IpLive[ipAddress] == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Removing IP")
 		if live == false {
-			err := master.dns.RemoveIP(ipAddress)
+			err := Master.Dns.RemoveIP(ipAddress)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := master.dns.AddIP(ipAddress)
+			err := Master.Dns.AddIP(ipAddress)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
