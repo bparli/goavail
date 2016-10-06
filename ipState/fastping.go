@@ -1,6 +1,7 @@
 package ipState
 
 import (
+	"fmt"
 	"net"
 	"os"
 	"os/signal"
@@ -86,6 +87,11 @@ loop:
 				}
 				master.results[ipAddr] = nil
 			}
+		case <-master.p.Done():
+			if err := master.p.Err(); err != nil {
+				fmt.Println("Ping failed:", err)
+			}
+			break loop
 		}
 	}
 	signal.Stop(c)
