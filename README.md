@@ -9,7 +9,7 @@ These EIPs live in separate AZs, and since we're also proxying these EIPs throug
 ##Running
 To run the agent first clone and build with Godep.  Then run the binary with the "monitor" command and specify the configuration file (default is goavail.toml).  For example: `./goavail monitor --config-file goavail.toml`
 
-See goavail.toml for a configration example
+The agent must be run as root user since its using raw socket for the ICMP.  Also see goavail.toml for a configration example
 
 ##Cluster Mode
 Cluster mode uses a fork of the [memberlist library] (https://github.com/hashicorp/memberlist) to verify peers' health.  If a node sees an IP failure, it will notify its peers before invoking the DNS interface to take the failed IP out of the Pool.  A node will only remove an IP from the pool once its noted a failure and recieved confirmation from a peer.  
