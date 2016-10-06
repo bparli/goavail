@@ -93,7 +93,9 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 		if err != nil {
 			log.Errorln("Error notifying Peers", err)
 		}
+	} else {
+		Gm.Mutex.RUnlock()
 	}
-	Gm.Mutex.RUnlock()
+
 	return nil
 }
