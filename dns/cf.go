@@ -1,7 +1,6 @@
 package dns
 
 import (
-	"errors"
 	"os"
 	"strings"
 
@@ -35,7 +34,7 @@ func (r *CFlare) AddIP(ipAddress string) error {
 
 func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	// Construct a new API object
-	log.Infoln("Adding ", name, ipAddress, " to Cloudflare")
+	log.Infoln("Adding", name, ipAddress, "to Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
 		log.Errorln(err)
@@ -58,12 +57,22 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 		Proxied:  r.Proxied,
 	}
 
+	dnsRec, err := api.DNSRecords(zoneId, *params)
+	if err != nil {
+		log.Errorln(err)
+		return err
+	}
+	if len(dnsRec) == 1 {
+		log.Infoln("DNS Record already added")
+		return nil
+	}
+
 	resp, err := api.CreateDNSRecord(zoneId, *params)
 	if err != nil {
 		log.Errorln(err)
 		return err
 	}
-	log.Debug(resp)
+	log.Debugln("CF response", resp)
 
 	return nil
 }
@@ -80,7 +89,7 @@ func (r *CFlare) RemoveIP(ipAddress string) error {
 
 func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 	// Construct a new API object
-	log.Infoln("Deleting ", name, ipAddress, " from Cloudflare")
+	log.Infoln("Deleting", name, ipAddress, "from Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
 	if err != nil {
 		log.Errorln(err)
@@ -112,13 +121,13 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 	log.Infoln(dnsRec)
 
 	if len(dnsRec) == 0 {
-		err := errors.New("There are no DNS records")
-		log.Errorln(err)
-		return err
+		log.Infoln("DNS Record already removed")
+		return nil
 	}
 
 	err = api.DeleteDNSRecord(zoneId, dnsRec[0].ID)
 	if err != nil {
+		log.Debug(err.Error())
 		log.Errorln(err)
 		return err
 	}
