@@ -67,7 +67,7 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 	Gm.Mutex.RLock()
 	if Gm.IpLive[ipAddress] == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
 		Gm.Mutex.RUnlock()
-		log.Debugln("Received agreement from Peer.  Removing IP")
+		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
 			err := Master.Dns.RemoveIP(ipAddress)
 			if err != nil {
