@@ -1,8 +1,0 @@
-ip_addresses = ['52.39.59.175', '52.40.182.96']
-failure_threshold = 3
-dns_domain = "nitroplatformdev.com"
-hostnames = ["test-api", "test-dserv", "test-document"]
-dns_proxied = true
-peers = ["127.0.0.1:8081"]
-local_addr = "127.0.0.1:8082"
-members_port = 7947
