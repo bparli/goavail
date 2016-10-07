@@ -1,7 +1,7 @@
-ip_addresses = ['52.39.59.175', '52.40.182.96']
+ip_addresses = ['EIP_1', 'EIP_2']
 failure_threshold = 3
-dns_domain = "nitroplatformdev.com"
-hostnames = ["test-api", "test-dserv", "test-document"]
+dns_domain = "DOMAIN"
+hostnames = ["HOST1", "HOST2", "HOST3"]
 dns_proxied = true
-peers = ["172.16.46.182:8081"]
-local_addr = "10.20.20.173:8081"
+peers = ["PEER_IP:PEER_PORT"]
+local_addr = "LOCAL_IP:LOCAL_PORT"
