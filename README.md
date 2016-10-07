@@ -2,7 +2,7 @@
 ===============
 Goavail is an IP monitoring and fast DNS failover agent written in Go.  
 
-This personal project was done as part of Nitro Software's hack week.  We run our systems across multiple AWS Availability Zones, but are still succeptible if an AZ itself goes down.  This tool is meant to serve as an external monitoring agent, able to trigger DNS A record updates should an AWS zone go down.  The agent continuously pings a set of IP Addresses (EIPs) in a certain domain, noting their health.  After three consecutive misses, the IP and its associated domains are removed from DNS.  The agent will continue to monitor the EIP and should come back alive for some reason, will enter it back into service with the appropriate API calls through the DNS interface.  
+This personal project was done as part of Nitro Software's hack week.  We run our systems across multiple AWS Availability Zones, but are still succeptible if an AZ itself goes down.  This tool is meant to serve as an external monitoring agent, able to trigger DNS A record updates should an AWS zone go down.  The agent continuously pings a set of IP Addresses (EIPs) in a certain domain, noting their health.  After three consecutive misses, the IP and its associated A records are removed from DNS.  The agent will continue to monitor the EIP and, should it come back alive for some reason, will enter it back into service with the appropriate API call via the DNS interface.  
 
 These EIPs live in separate AZs, and since we're also proxying these EIPs through our CDN/DNS, this failover should be a matter of seconds.
 
