@@ -29,8 +29,7 @@ type response struct {
 
 var Master Pingmon
 
-func StartPingMon(dnsConfig *dns.CFlare, threshold int) {
-
+func initMaster(dnsConfig *dns.CFlare, threshold int) {
 	Master.P = fastping.NewPinger()
 	Master.Dns = dnsConfig
 	Master.Mutex = &sync.RWMutex{}
@@ -38,14 +37,6 @@ func StartPingMon(dnsConfig *dns.CFlare, threshold int) {
 	Master.Results = make(map[string]*response)
 	Master.AddressFails = make(map[string]int)
 	Master.AddressSuccesses = make(map[string]int)
-
-	onRecv, onIdle := make(chan *response), make(chan bool)
-	Master.P.OnRecv = func(addr *net.IPAddr, t time.Duration) {
-		onRecv <- &response{addr: addr, rtt: t}
-	}
-	Master.P.OnIdle = func() {
-		onIdle <- true
-	}
 
 	Master.Results = make(map[string]*response)
 	for _, ip := range dnsConfig.Addresses {
@@ -56,6 +47,17 @@ func StartPingMon(dnsConfig *dns.CFlare, threshold int) {
 	}
 
 	Master.P.MaxRTT = 2 * time.Second
+}
+
+func StartPingMon(dnsConfig *dns.CFlare, threshold int) {
+	initMaster(dnsConfig, threshold)
+	onRecv, onIdle := make(chan *response), make(chan bool)
+	Master.P.OnRecv = func(addr *net.IPAddr, t time.Duration) {
+		onRecv <- &response{addr: addr, rtt: t}
+	}
+	Master.P.OnIdle = func() {
+		onIdle <- true
+	}
 
 	Master.P.RunLoop()
 
@@ -74,7 +76,7 @@ loop:
 			Master.Results[res.addr.String()] = res
 			if Master.AddressSuccesses[res.addr.String()] == 3 {
 				log.Infoln("IP Address ", res.addr.String(), " back in service")
-				handleTansition(res.addr.String(), true)
+				handleTransition(res.addr.String(), true)
 			}
 			Master.AddressSuccesses[res.addr.String()] += 1
 			Master.AddressFails[res.addr.String()] = 0
@@ -83,7 +85,7 @@ loop:
 				if r == nil {
 					log.Debugln(ipAddr, ": unreachable, ", time.Now())
 					if Master.AddressFails[ipAddr] == 3 {
-						handleTansition(ipAddr, false)
+						handleTransition(ipAddr, false)
 					}
 					Master.AddressFails[ipAddr] += 1
 					Master.AddressSuccesses[ipAddr] = 0

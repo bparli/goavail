@@ -69,12 +69,12 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
-			err := Master.Dns.RemoveIP(ipAddress)
+			err := Master.Dns.RemoveIp(ipAddress)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := Master.Dns.AddIP(ipAddress)
+			err := Master.Dns.AddIp(ipAddress)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}

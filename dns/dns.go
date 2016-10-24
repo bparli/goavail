@@ -1,6 +1,6 @@
 package dns
 
 type DnsProvider interface {
-	AddIP(ipAddress string) error
-	RemoveIP(ipAddress string) error
+	AddIp(ipAddress string) error
+	RemoveIp(ipAddress string) error
 }

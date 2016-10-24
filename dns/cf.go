@@ -22,7 +22,7 @@ func (r *CFlare) formatHostname(host string) string {
 	return host + "." + r.DnsDomain
 }
 
-func (r *CFlare) AddIP(ipAddress string) error {
+func (r *CFlare) AddIp(ipAddress string) error {
 	for _, name := range r.Hostnames {
 		err := r.addDNSName(name, ipAddress)
 		if err != nil {
@@ -73,7 +73,7 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	return nil
 }
 
-func (r *CFlare) RemoveIP(ipAddress string) error {
+func (r *CFlare) RemoveIp(ipAddress string) error {
 	for _, name := range r.Hostnames {
 		err := r.deleteDNSName(name, ipAddress)
 		if err != nil {
