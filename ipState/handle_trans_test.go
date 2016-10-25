@@ -29,12 +29,12 @@ type MockDnsProvider interface {
 	MockRemoveIp(ipAddress string) error
 }
 
-func (r *MockCFlare) AddIp(ipAddress string) error {
+func (r *MockCFlare) AddIp(ipAddress string, dryRun bool) error {
 	DnsCount += 1
 	return nil
 }
 
-func (r *MockCFlare) RemoveIp(ipAddress string) error {
+func (r *MockCFlare) RemoveIp(ipAddress string, dryRun bool) error {
 	DnsCount -= 1
 	return nil
 }
@@ -92,7 +92,7 @@ func Test_handleTransition(t *testing.T) {
 	Convey("When running fastping", t, func() {
 
 		dnsConfig, _ := mockConfigureCloudflare()
-		InitGM(dnsConfig.Addresses)
+		InitGM(dnsConfig.Addresses, true)
 		Gm.Clustered = false
 		mockInitMaster(dnsConfig, 3)
 		handleTransition("127.0.0.1", true)

@@ -10,6 +10,7 @@ import (
 	"github.com/bparli/goavail/dns"
 	"github.com/bparli/goavail/httpService"
 	"github.com/bparli/goavail/ipState"
+	"github.com/bparli/goavail/notify"
 )
 
 func configureCloudflare(config *GoavailConfig) (*dns.CFlare, error) {
@@ -22,16 +23,18 @@ func configureCloudflare(config *GoavailConfig) (*dns.CFlare, error) {
 	return &dnsConfig, nil
 }
 
-func loadMonitor(configFile string) {
+func loadMonitor(configFile string, dryRun bool) {
 	config := parseConfig(configFile)
-
+	if config.SlackAddr != "" {
+		notify.InitSlack(config.SlackAddr)
+	}
 	dnsConfig, err := configureCloudflare(config)
 	if err != nil {
 		log.Fatalln("Error initializing Cloudflare: ", err)
 
 	}
 
-	ipState.InitGM(config.Addresses)
+	ipState.InitGM(config.Addresses, dryRun)
 	if len(config.Peers) > 0 && config.LocalAddr != "" {
 		go httpService.UpdatesListener(config.LocalAddr)
 		log.Debugln("Running in Cluster mode")
@@ -89,7 +92,7 @@ func main() {
 	log.SetLevel(log.DebugLevel)
 	opts := parseCommandLine()
 	if *opts.Command == "monitor" {
-		loadMonitor(*opts.ConfigFile)
+		loadMonitor(*opts.ConfigFile, *opts.DryRun)
 	}
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGHUP)

@@ -18,6 +18,7 @@ type GlobalMap struct {
 	LocalAddr string
 	Clustered bool
 	Members   *memberlist.Memberlist
+	DryRun    bool
 }
 
 type HttpUpdate struct {
@@ -28,13 +29,13 @@ type HttpUpdate struct {
 
 var Gm *GlobalMap
 
-func InitGM(ipAddresses []string) {
+func InitGM(ipAddresses []string, dryRun bool) {
 	m := make(map[string]bool)
 	for _, ip := range ipAddresses {
 		m[ip] = true
 	}
 
-	Gm = &GlobalMap{IpLive: m, Mutex: &sync.RWMutex{}}
+	Gm = &GlobalMap{IpLive: m, Mutex: &sync.RWMutex{}, DryRun: dryRun}
 }
 
 //NotifyPeers will update all peers on an IP address state change
@@ -69,12 +70,12 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
-			err := Master.Dns.RemoveIp(ipAddress)
+			err := Master.Dns.RemoveIp(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := Master.Dns.AddIp(ipAddress)
+			err := Master.Dns.AddIp(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}

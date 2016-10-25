@@ -11,12 +11,12 @@ func handleTransition(ipAddress string, live bool) {
 	} else {
 		log.Debugln("Running in single mode, updating DNS")
 		if live == true {
-			err := Master.Dns.AddIp(ipAddress)
+			err := Master.Dns.AddIp(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
 		} else {
-			err := Master.Dns.RemoveIp(ipAddress)
+			err := Master.Dns.RemoveIp(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}

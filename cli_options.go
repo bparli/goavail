@@ -8,6 +8,7 @@ import (
 type GoavailOpts struct {
 	Command    *string
 	ConfigFile *string
+	DryRun     *bool
 }
 
 func parseCommandLine() *GoavailOpts {
@@ -17,6 +18,7 @@ func parseCommandLine() *GoavailOpts {
 	opts.ConfigFile = kingpin.Flag("config-file", "The configuration TOML file path").Short('f').Default("goavail.toml").String()
 	kingpin.Command("monitor", "Monitor set of Public IP Addresses in goavail.toml")
 	kingpin.Flag("laddr", "The port to listen for updates on from peers (Cluster mode only)").Short('l').Default("8081").String()
+	opts.DryRun = kingpin.Flag("dry-run", "Is this a dry run?").Short('d').Default("true").Bool()
 
 	command := kingpin.Parse()
 	opts.Command = &command

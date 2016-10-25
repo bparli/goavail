@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/bparli/goavail/notify"
 	"github.com/cloudflare/cloudflare-go"
 )
 
@@ -22,12 +23,19 @@ func (r *CFlare) formatHostname(host string) string {
 	return host + "." + r.DnsDomain
 }
 
-func (r *CFlare) AddIp(ipAddress string) error {
-	for _, name := range r.Hostnames {
-		err := r.addDNSName(name, ipAddress)
-		if err != nil {
-			return err
+func (r *CFlare) AddIp(ipAddress string, dryRun bool) error {
+	if dryRun {
+		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
+	} else {
+		for _, name := range r.Hostnames {
+			err := r.addDNSName(name, ipAddress)
+			if err != nil {
+				return err
+			}
 		}
+	}
+	if notify.SlackNotify.UseSlack == true {
+		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Added", dryRun)
 	}
 	return nil
 }
@@ -41,7 +49,7 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	}
 
 	// Fetch the zone ID
-	zoneId, err := api.ZoneIDByName(r.DnsDomain) // Assumes exists CloudFlare already
+	zoneId, err := api.ZoneIDByName(r.DnsDomain) // Assumes exists in CloudFlare already
 	if err != nil {
 		return err
 	}
@@ -73,12 +81,19 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 	return nil
 }
 
-func (r *CFlare) RemoveIp(ipAddress string) error {
-	for _, name := range r.Hostnames {
-		err := r.deleteDNSName(name, ipAddress)
-		if err != nil {
-			return err
+func (r *CFlare) RemoveIp(ipAddress string, dryRun bool) error {
+	if dryRun {
+		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
+	} else {
+		for _, name := range r.Hostnames {
+			err := r.deleteDNSName(name, ipAddress)
+			if err != nil {
+				return err
+			}
 		}
+	}
+	if notify.SlackNotify.UseSlack == true {
+		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Removed", dryRun)
 	}
 	return nil
 }

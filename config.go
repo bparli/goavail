@@ -13,6 +13,7 @@ type GoavailConfig struct {
 	Proxied   bool     `toml:"dns_proxied"`
 	Peers     []string `toml:"peers"`
 	LocalAddr string   `toml:"local_addr"`
+	SlackAddr string   `toml:"slack_addr"`
 }
 
 func parseConfig(path string) *GoavailConfig {

@@ -1,7 +1,0 @@
-ip_addresses = ['EIP_1', 'EIP_2']
-failure_threshold = 3
-dns_domain = "DOMAIN"
-hostnames = ["HOST1", "HOST2", "HOST3"]
-dns_proxied = true
-peers = ["PEER_IP:PEER_PORT"]
-local_addr = "LOCAL_IP:LOCAL_PORT"
