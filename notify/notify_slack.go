@@ -29,9 +29,9 @@ func (s *slackNotifications) SendToSlack(ipAddr string, domain string, addOrRemo
 	log.Debugln("Dry Run is True, sending Slack notification", "https://hooks.slack.com/services/"+s.slackAddr)
 	text := ""
 	if dryRun {
-		text = "Dry Run set to True.  Would have " + addOrRemove + " " + ipAddr + " and configured entries from/to domain " + domain + " "
+		text = "Dry Run set to True.  Agent would have " + addOrRemove + " " + ipAddr + " and configured entries from/to domain " + domain + " "
 	} else {
-		text = "Dry Run set to False. " + addOrRemove + " " + ipAddr + " and configured entries from/to domain " + domain + " "
+		text = "Dry Run set to False. Agent " + addOrRemove + " " + ipAddr + " and configured entries from/to domain " + domain + " "
 	}
 	var p Params = map[string]string{
 		"text": text,
