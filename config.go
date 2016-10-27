@@ -6,14 +6,15 @@ import (
 )
 
 type GoavailConfig struct {
-	Addresses []string `toml:"ip_addresses"`
-	Threshold int      `toml:"failure_threshold"`
-	DnsDomain string   `toml:"dns_domain"`
-	HostNames []string `toml:"hostnames"`
-	Proxied   bool     `toml:"dns_proxied"`
-	Peers     []string `toml:"peers"`
-	LocalAddr string   `toml:"local_addr"`
-	SlackAddr string   `toml:"slack_addr"`
+	Addresses   []string `toml:"ip_addresses"`
+	Threshold   int      `toml:"failure_threshold"`
+	DnsDomain   string   `toml:"dns_domain"`
+	HostNames   []string `toml:"hostnames"`
+	Proxied     bool     `toml:"dns_proxied"`
+	Peers       []string `toml:"peers"`
+	LocalAddr   string   `toml:"local_addr"`
+	SlackAddr   string   `toml:"slack_addr"`
+	MembersPort int      `toml:"members_port"`
 }
 
 func parseConfig(path string) *GoavailConfig {

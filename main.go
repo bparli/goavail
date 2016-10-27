@@ -41,7 +41,7 @@ func loadMonitor(configFile string, dryRun bool) {
 		ipState.Gm.Clustered = true
 		ipState.Gm.Peers = config.Peers
 		ipState.Gm.LocalAddr = config.LocalAddr
-		ipState.InitMembersList(config.LocalAddr, config.Peers)
+		ipState.InitMembersList(config.LocalAddr, config.Peers, config.MembersAddr)
 	} else {
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
 		ipState.Gm.Clustered = false
@@ -67,7 +67,7 @@ func reloadMonitor(configFile string) {
 		ipState.Gm.Clustered = true
 		ipState.Gm.Peers = config.Peers
 		ipState.Gm.LocalAddr = config.LocalAddr
-		ipState.InitMembersList(config.LocalAddr, config.Peers)
+		ipState.InitMembersList(config.LocalAddr, config.Peers, config.MembersPort)
 	} else if len(config.Peers) == 0 && config.LocalAddr == "" && ipState.Gm.Clustered == true { //if we are currently clustered but don't want to be
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
 		ipState.Gm.Clustered = false

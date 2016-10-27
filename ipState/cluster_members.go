@@ -7,10 +7,12 @@ import (
 	"github.com/nitro/memberlist"
 )
 
-func InitMembersList(localAddr string, peer []string) {
-	memberlistConfig := memberlist.DefaultLocalConfig()
+func InitMembersList(localAddr string, peer []string, membersPort int) {
+	memberlistConfig := memberlist.DefaultWANConfig()
 	localIP := strings.Split(localAddr, ":")[0]
 	memberlistConfig.AdvertiseAddr = localIP
+	memberlistConfig.AdvertisePort = membersPort
+	memberlistConfig.BindPort = membersPort
 
 	var err error
 	Gm.Members, err = memberlist.Create(memberlistConfig)
