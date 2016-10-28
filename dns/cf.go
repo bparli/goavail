@@ -28,7 +28,7 @@ func (r *CFlare) AddIp(ipAddress string, dryRun bool) error {
 		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
 	} else {
 		for _, name := range r.Hostnames {
-			err := r.addDNSName(name, ipAddress)
+			err := r.addDNSName(name, ipAddress, dryRun)
 			if err != nil {
 				return err
 			}
@@ -40,7 +40,7 @@ func (r *CFlare) AddIp(ipAddress string, dryRun bool) error {
 	return nil
 }
 
-func (r *CFlare) addDNSName(name string, ipAddress string) error {
+func (r *CFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
 	// Construct a new API object
 	log.Infoln("Adding", name, ipAddress, "to Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
@@ -71,26 +71,14 @@ func (r *CFlare) addDNSName(name string, ipAddress string) error {
 		log.Infoln("DNS Record already added")
 		return nil
 	}
-
-	resp, err := api.CreateDNSRecord(zoneId, *params)
-	if err != nil {
-		return err
-	}
-	log.Debugln("CF response", resp)
-
-	return nil
-}
-
-func (r *CFlare) RemoveIp(ipAddress string, dryRun bool) error {
 	if dryRun {
 		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
 	} else {
-		for _, name := range r.Hostnames {
-			err := r.deleteDNSName(name, ipAddress)
-			if err != nil {
-				return err
-			}
+		resp, err := api.CreateDNSRecord(zoneId, *params)
+		if err != nil {
+			return err
 		}
+		log.Debugln("CF response", resp)
 	}
 	if notify.SlackNotify.UseSlack == true {
 		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Removed", dryRun)
@@ -98,7 +86,18 @@ func (r *CFlare) RemoveIp(ipAddress string, dryRun bool) error {
 	return nil
 }
 
-func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
+func (r *CFlare) RemoveIp(ipAddress string, dryRun bool) error {
+
+	for _, name := range r.Hostnames {
+		err := r.deleteDNSName(name, ipAddress, dryRun)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func (r *CFlare) deleteDNSName(name string, ipAddress string, dryRun bool) error {
 	// Construct a new API object
 	log.Infoln("Deleting", name, ipAddress, "from Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
@@ -132,10 +131,16 @@ func (r *CFlare) deleteDNSName(name string, ipAddress string) error {
 		log.Infoln("DNS Record already removed")
 		return nil
 	}
-
-	err = api.DeleteDNSRecord(zoneId, dnsRec[0].ID)
-	if err != nil {
-		return err
+	if dryRun {
+		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
+	} else {
+		err = api.DeleteDNSRecord(zoneId, dnsRec[0].ID)
+		if err != nil {
+			return err
+		}
+	}
+	if notify.SlackNotify.UseSlack == true {
+		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Removed", dryRun)
 	}
 	return nil
 }
