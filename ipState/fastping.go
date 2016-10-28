@@ -74,7 +74,7 @@ loop:
 			break loop
 		case res := <-onRecv:
 			Master.Results[res.addr.String()] = res
-			if Master.AddressSuccesses[res.addr.String()] == 3 {
+			if Master.AddressSuccesses[res.addr.String()] == threshold {
 				log.Infoln("IP Address ", res.addr.String(), " back in service")
 				handleTransition(res.addr.String(), true)
 			}
@@ -84,7 +84,7 @@ loop:
 			for ipAddr, r := range Master.Results {
 				if r == nil {
 					log.Debugln(ipAddr, ": unreachable, ", time.Now())
-					if Master.AddressFails[ipAddr] == 3 {
+					if Master.AddressFails[ipAddr] == threshold {
 						handleTransition(ipAddr, false)
 					}
 					Master.AddressFails[ipAddr] += 1

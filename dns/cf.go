@@ -24,18 +24,11 @@ func (r *CFlare) formatHostname(host string) string {
 }
 
 func (r *CFlare) AddIp(ipAddress string, dryRun bool) error {
-	if dryRun {
-		log.Infoln("Dry Run is True.  Would have updated DNS for address " + ipAddress)
-	} else {
-		for _, name := range r.Hostnames {
-			err := r.addDNSName(name, ipAddress, dryRun)
-			if err != nil {
-				return err
-			}
+	for _, name := range r.Hostnames {
+		err := r.addDNSName(name, ipAddress, dryRun)
+		if err != nil {
+			return err
 		}
-	}
-	if notify.SlackNotify.UseSlack == true {
-		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Added", dryRun)
 	}
 	return nil
 }
@@ -87,7 +80,6 @@ func (r *CFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
 }
 
 func (r *CFlare) RemoveIp(ipAddress string, dryRun bool) error {
-
 	for _, name := range r.Hostnames {
 		err := r.deleteDNSName(name, ipAddress, dryRun)
 		if err != nil {
