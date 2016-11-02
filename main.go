@@ -92,8 +92,10 @@ func reloadMonitor(configFile string) {
 
 func main() {
 	runtime.GOMAXPROCS(2)
-	log.SetLevel(log.DebugLevel)
 	opts := parseCommandLine()
+	if *opts.Debug {
+		log.SetLevel(log.DebugLevel)
+	}
 	if *opts.Command == "monitor" {
 		loadMonitor(*opts.ConfigFile, *opts.DryRun)
 	}
