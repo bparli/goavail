@@ -1,6 +1,8 @@
 package ipState
 
-import log "github.com/Sirupsen/logrus"
+import (
+	log "github.com/Sirupsen/logrus"
+)
 
 func handleTransition(ipAddress string, live bool) {
 	if Gm.Clustered && Gm.Members.NumMembers() > 1 {

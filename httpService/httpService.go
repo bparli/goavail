@@ -22,7 +22,10 @@ func recvNote(w http.ResponseWriter, r *http.Request) {
 		log.Fatal(err)
 	}
 	log.Debugln("Received Update: ", update.IpAddress, update.Live, update.Peer)
-	ipState.NotifyIpState(update.IpAddress, update.Live, true)
+	liveCheck := ipState.UpdateGlobalState(update.IpAddress, update.Live, update.Peer) //update global state and check overall status
+	if liveCheck >= ipState.Gm.MinAgreement || liveCheck <= -1*ipState.Gm.MinAgreement {
+		ipState.NotifyIpState(update.IpAddress, update.Live, true)
+	}
 	if err != nil {
 		log.Debugln(err)
 	}
