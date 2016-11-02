@@ -25,6 +25,8 @@ func recvNote(w http.ResponseWriter, r *http.Request) {
 	liveCheck := ipState.UpdateGlobalState(update.IpAddress, update.Live, update.Peer) //update global state and check overall status
 	if liveCheck >= ipState.Gm.MinAgreement || liveCheck <= -1*ipState.Gm.MinAgreement {
 		ipState.NotifyIpState(update.IpAddress, update.Live, true)
+	} else {
+		log.Debugln("Have not received enough Peer agreement.  Received ", liveCheck, " agreements, but need ", ipState.Gm.MinAgreement)
 	}
 	if err != nil {
 		log.Debugln(err)
