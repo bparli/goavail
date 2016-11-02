@@ -11,18 +11,21 @@ func handleTransition(ipAddress string, live bool) {
 			log.Errorln("Error Updating state: ", ipAddress, err)
 		}
 	} else {
-		log.Debugln("Running in single mode, updating DNS")
-		if live == true {
-			err := Master.Dns.AddIp(ipAddress, Gm.DryRun)
-			if err != nil {
-				log.Errorln("Error Adding IP: ", ipAddress, err)
-			}
+		if Gm.MinAgreement > 0 {
+			log.Debugln("Running in single mode, BUT need agreement from peers in cluster mode")
 		} else {
-			err := Master.Dns.RemoveIp(ipAddress, Gm.DryRun)
-			if err != nil {
-				log.Errorln("Error Removing IP: ", ipAddress, err)
+			log.Debugln("Running in single mode, updating DNS")
+			if live == true {
+				err := Master.Dns.AddIp(ipAddress, Gm.DryRun)
+				if err != nil {
+					log.Errorln("Error Adding IP: ", ipAddress, err)
+				}
+			} else {
+				err := Master.Dns.RemoveIp(ipAddress, Gm.DryRun)
+				if err != nil {
+					log.Errorln("Error Removing IP: ", ipAddress, err)
+				}
 			}
 		}
-
 	}
 }
