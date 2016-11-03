@@ -73,6 +73,10 @@ func notifyPeers(ipAddress string, live bool) error {
 		}
 		buff := bytes.NewBuffer(data)
 		req, err := http.NewRequest("POST", "http://"+peer, buff)
+		if err != nil {
+			log.Errorln("Error forming new request", err)
+			return err
+		}
 		req.Close = true
 		req.Header.Set("Content-Type", "application/json")
 		client := &http.Client{}
