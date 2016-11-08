@@ -43,7 +43,7 @@ func initMaster(dnsConfig *dns.CFlare, threshold int) {
 		Master.Results[ip] = nil
 		Master.P.AddIP(ip)
 		Master.AddressFails[ip] = 0
-		Master.AddressSuccesses[ip] = 4 //initialize IPs such that they are already in service at start time
+		Master.AddressSuccesses[ip] = threshold + 1 //initialize IPs such that they are already in service at start time
 	}
 
 	Master.P.MaxRTT = 2 * time.Second
