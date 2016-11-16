@@ -16,6 +16,16 @@ type CFlare struct {
 	Hostnames []string
 }
 
+func ConfigureCloudflare(domain string, proxied bool, addresses []string, hostnames []string) (*CFlare, error) {
+	dnsConfig := CFlare{
+		domain,
+		proxied,
+		addresses,
+		hostnames}
+
+	return &dnsConfig, nil
+}
+
 func (r *CFlare) formatHostname(host string) string {
 	if strings.Contains(host, r.DnsDomain) {
 		return host

@@ -33,7 +33,6 @@ func initMaster(dnsConfig *dns.CFlare, threshold int) {
 	Master.P = fastping.NewPinger()
 	Master.Dns = dnsConfig
 	Master.Mutex = &sync.RWMutex{}
-
 	Master.Results = make(map[string]*response)
 	Master.AddressFails = make(map[string]int)
 	Master.AddressSuccesses = make(map[string]int)

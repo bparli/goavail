@@ -46,10 +46,6 @@ func InitGM(ipAddresses []string, dryRun bool) {
 	Gm = &GlobalMap{IpLive: m, Mutex: &sync.RWMutex{}, DryRun: dryRun}
 }
 
-func newPeersViewsMap() *peersIpStatus {
-	return &peersIpStatus{IpsView: make(map[string]bool)}
-}
-
 //Initialize the state of Peers' IP views to be true
 func InitPeersIpViews() {
 	Gm.peersIpView = make(map[string]*peersIpStatus)

@@ -13,25 +13,14 @@ import (
 	"github.com/bparli/goavail/notify"
 )
 
-func configureCloudflare(config *GoavailConfig) (*dns.CFlare, error) {
-	dnsConfig := dns.CFlare{
-		config.DnsDomain,
-		config.Proxied,
-		config.Addresses,
-		config.HostNames}
-
-	return &dnsConfig, nil
-}
-
 func loadMonitor(configFile string, dryRun bool) {
 	config := parseConfig(configFile)
 	if config.SlackAddr != "" {
 		notify.InitSlack(config.SlackAddr)
 	}
-	dnsConfig, err := configureCloudflare(config)
+	dnsConfig, err := dns.ConfigureCloudflare(config.DnsDomain, config.Proxied, config.Addresses, config.HostNames)
 	if err != nil {
 		log.Fatalln("Error initializing Cloudflare: ", err)
-
 	}
 
 	ipState.InitGM(config.Addresses, dryRun)
@@ -56,7 +45,7 @@ func loadMonitor(configFile string, dryRun bool) {
 func reloadMonitor(configFile string) {
 	config := parseConfig(configFile)
 
-	dnsConfig, err := configureCloudflare(config)
+	dnsConfig, err := dns.ConfigureCloudflare(config.DnsDomain, config.Proxied, config.Addresses, config.HostNames)
 	if err != nil {
 		log.Fatalln("Error initializing Cloudflare: ", err)
 
