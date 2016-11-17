@@ -77,7 +77,7 @@ func mockInitMaster(dnsConfig *MockCFlare, threshold int) {
 var DnsCount = 0
 
 func mockConfigureCloudflare() (*MockCFlare, error) {
-	adds := []string{"127.0.0.1"}
+	adds := []string{"52.52.52.52"}
 	host := []string{"dummy_host"}
 	dnsConfig := MockCFlare{
 		"dummy_domain",
@@ -90,16 +90,14 @@ func mockConfigureCloudflare() (*MockCFlare, error) {
 
 func Test_handleTransition(t *testing.T) {
 	Convey("When running fastping", t, func() {
-
 		dnsConfig, _ := mockConfigureCloudflare()
 		InitGM(dnsConfig.Addresses, true)
 		Gm.Clustered = false
 		mockInitMaster(dnsConfig, 3)
-		handleTransition("127.0.0.1", true)
+		handleTransition("52.52.52.52", true)
 		So(DnsCount, ShouldEqual, 1)
-		handleTransition("127.0.0.1", false)
+		handleTransition("52.52.52.52", false)
 		So(DnsCount, ShouldEqual, 0)
-
 	})
 
 }

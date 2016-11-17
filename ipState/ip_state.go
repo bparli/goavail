@@ -20,7 +20,6 @@ type GlobalMap struct {
 	peersIpView  map[string]*peersIpStatus //map of monitored IP addresses to each peers' views of them
 	MinAgreement int
 	Mutex        *sync.RWMutex
-	Gossip       *memberlist.Memberlist
 	Peers        []string
 	LocalAddr    string
 	Clustered    bool
