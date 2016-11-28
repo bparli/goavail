@@ -16,6 +16,7 @@ type GoavailConfig struct {
 	SlackAddr     string   `toml:"slack_addr"`
 	MembersPort   int      `toml:"members_port"`
 	MinPeersAgree int      `toml:"min_peers_agree"`
+	CryptoKey     string   `toml:"crypto_key"`
 }
 
 func parseConfig(path string) *GoavailConfig {

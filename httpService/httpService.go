@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/bparli/goavail/encrypt"
 	"github.com/bparli/goavail/ipState"
 	"github.com/gorilla/mux"
 )
@@ -21,6 +22,12 @@ func recvNote(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	if ipState.Gm.CryptoKey != "" { //payload should be encrypted so need to decrypt
+		update.Peer = encrypt.Decrypt([]byte(ipState.Gm.CryptoKey), update.Peer)
+		update.IpAddress = encrypt.Decrypt([]byte(ipState.Gm.CryptoKey), update.IpAddress)
+	}
+
 	log.Debugln("Received Update: ", update.IpAddress, update.Live, update.Peer)
 	liveCheck := ipState.UpdateGlobalState(update.IpAddress, update.Live, update.Peer) //update global state and check overall status
 	if liveCheck >= ipState.Gm.MinAgreement || liveCheck <= -1*ipState.Gm.MinAgreement {

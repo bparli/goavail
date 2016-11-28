@@ -7,6 +7,7 @@ import (
 	"sync"
 
 	log "github.com/Sirupsen/logrus"
+	"github.com/bparli/goavail/encrypt"
 	"github.com/nitro/memberlist"
 )
 
@@ -25,6 +26,7 @@ type GlobalMap struct {
 	Clustered    bool
 	Members      *memberlist.Memberlist
 	DryRun       bool
+	CryptoKey    string
 }
 
 type HttpUpdate struct {
@@ -58,9 +60,15 @@ func InitPeersIpViews() {
 
 //notifyPeers will update all peers on an IP address state change
 func notifyPeers(ipAddress string, live bool) error {
+	LocalAddr := Gm.LocalAddr
+	if Gm.CryptoKey != "" {
+		LocalAddr = encrypt.Encrypt([]byte(Gm.CryptoKey), Gm.LocalAddr)
+		ipAddress = encrypt.Encrypt([]byte(Gm.CryptoKey), ipAddress)
+	}
+
 	for _, peer := range Gm.Peers {
 		log.Debugln("Send update to peer:", peer)
-		upd := &HttpUpdate{Peer: Gm.LocalAddr, IpAddress: ipAddress, Live: live}
+		upd := &HttpUpdate{Peer: LocalAddr, IpAddress: ipAddress, Live: live}
 		data, err := json.Marshal(upd)
 		if err != nil {
 			log.Errorln("Error Marshaling", err)

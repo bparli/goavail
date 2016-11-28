@@ -38,6 +38,10 @@ func loadMonitor(configFile string, dryRun bool) {
 		ipState.Gm.Clustered = false
 	}
 
+	if config.CryptoKey != "" {
+		ipState.Gm.CryptoKey = config.CryptoKey
+	}
+
 	log.Debugln(config)
 	go ipState.StartPingMon(dnsConfig, config.Threshold)
 }
