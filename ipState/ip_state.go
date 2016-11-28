@@ -64,6 +64,7 @@ func notifyPeers(ipAddress string, live bool) error {
 	if Gm.CryptoKey != "" {
 		LocalAddr = encrypt.Encrypt([]byte(Gm.CryptoKey), Gm.LocalAddr)
 		ipAddress = encrypt.Encrypt([]byte(Gm.CryptoKey), ipAddress)
+		log.Debugln("Payload Encrypted")
 	}
 
 	for _, peer := range Gm.Peers {

@@ -26,6 +26,7 @@ func recvNote(w http.ResponseWriter, r *http.Request) {
 	if ipState.Gm.CryptoKey != "" { //payload should be encrypted so need to decrypt
 		update.Peer = encrypt.Decrypt([]byte(ipState.Gm.CryptoKey), update.Peer)
 		update.IpAddress = encrypt.Decrypt([]byte(ipState.Gm.CryptoKey), update.IpAddress)
+		log.Debugln("Payload Decrypted")
 	}
 
 	log.Debugln("Received Update: ", update.IpAddress, update.Live, update.Peer)
