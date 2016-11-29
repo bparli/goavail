@@ -1,0 +1,10 @@
+ip_addresses = ["52.52.52.52"]
+failure_threshold = 3
+dns_domain = "example.com"
+hostnames = ["test1", "test2", "test3"]
+dns_proxied = true
+peers = ["172.16.46.185:8081"]
+local_addr = "192.168.1.2:8081"
+members_port = 7947
+min_peers_agree = 1
+crypto_key = "1234567891012345"
