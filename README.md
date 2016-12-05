@@ -35,7 +35,7 @@ See goavail.toml for example settings
 * __local_addr__: the local IP address to advertise to the peers
 * __members_port__: Goavail uses memberlist to ensure the peers are online.  This allows a custom setting for the memberlist port
 * __min_peers_agree__: if the agent detects a change (and the above failure_threshold), it will notify its peers.  It must receive agreement from at least min_peers_agree before the agent can take any action.  This is to reduce false positive likelihood.
-* __crypto_key__: optional setting to encrypt the payload in updates to peers.
+* __crypto_key__: optional setting to encrypt the payload in updates to peers.  Note this just sets the AES private key; the IV is hardcoded.
 
 ##Reload 
 The tool also supports configuration reload.  Simply send a SIGHUP signal to the process and it will reload the modified configuration file
