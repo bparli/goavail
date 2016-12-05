@@ -7,11 +7,11 @@ This personal project was done as part of Nitro Software's hack week.  We run ou
 These EIPs live in separate AZs, and since we're also proxying these EIPs through our CDN/DNS, this failover should be a matter of seconds.
 
 ##Running
-To run the agent first clone and build with Godep.  Then run the binary with the "monitor" command and specify the configuration file (default is goavail.toml).  For example: 
+To run the agent first clone and build with Godep.  Then run the binary with the "monitor" command and specify the configuration file (default is goavail.toml).  The agent runs in "dry-run" mode by default.  Dry-run mode is totally passive and no DNS records can be updated.  For example: 
 
 ```bash
 $ godep go build
-$ ./goavail monitor --config-file goavail.toml
+$ ./goavail monitor --config-file --no-dry-run goavail.toml
 ```
 The agent must be run as root user since its using raw socket for the ICMP.  Also see goavail.toml for a configration example
 
