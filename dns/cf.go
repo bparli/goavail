@@ -84,7 +84,7 @@ func (r *CFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
 		log.Debugln("CF response", resp)
 	}
 	if notify.SlackNotify.UseSlack == true {
-		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Removed", dryRun)
+		notify.SlackNotify.SendToSlack(ipAddress, r.DnsDomain, "Added", dryRun)
 	}
 	return nil
 }
