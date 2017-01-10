@@ -5,6 +5,7 @@ import (
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
+//GoavailOpts type to pass input parameters
 type GoavailOpts struct {
 	Command    *string
 	ConfigFile *string

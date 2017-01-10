@@ -25,18 +25,18 @@ func Init() {
 	os.Unsetenv("CF_API_EMAIL")
 }
 
-func Test_AddIp(t *testing.T) {
+func Test_AddIP(t *testing.T) {
 	Convey("AddIp() should fail", t, func() {
 		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
-		err = cf.AddIp("127.0.0.1", true)
+		err = cf.AddIP("127.0.0.1", true)
 		So(err, ShouldNotEqual, nil)
 	})
 }
 
-func Test_RemoveIp(t *testing.T) {
+func Test_RemoveIP(t *testing.T) {
 	Convey("RemoveIp() should fail", t, func() {
 		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
-		err = cf.RemoveIp("127.0.0.1", true)
+		err = cf.RemoveIP("127.0.0.1", true)
 		So(err, ShouldNotEqual, nil)
 	})
 }
@@ -46,7 +46,7 @@ func Test_ConfigureCloudFlare(t *testing.T) {
 		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
 
 		So(err, ShouldEqual, nil)
-		So(cf.DnsDomain, ShouldEqual, "testing.com")
+		So(cf.DNSDomain, ShouldEqual, "testing.com")
 		So(cf.Proxied, ShouldEqual, true)
 		So(cf.Addresses[0], ShouldEqual, "127.0.0.1")
 		So(cf.Addresses[1], ShouldEqual, "127.0.0.2")
@@ -55,7 +55,7 @@ func Test_ConfigureCloudFlare(t *testing.T) {
 	})
 }
 
-func Test_FormatHostnameCf(t *testing.T) {
+func Test_FormatHostnameCF(t *testing.T) {
 	Convey("formatHostname()", t, func() {
 		cf, _ := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1"}, []string{"beavis.dummy.com"})
 

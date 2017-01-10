@@ -18,24 +18,24 @@ func Init() {
 }
 
 type MockCFlare struct {
-	DnsDomain string
+	DNSDomain string
 	Proxied   bool
 	Addresses []string
 	Hostnames []string
 }
 
-type MockDnsProvider interface {
+type MockDNSProvider interface {
 	MockAddIp(ipAddress string) error
 	MockRemoveIp(ipAddress string) error
 }
 
-func (r *MockCFlare) AddIp(ipAddress string, dryRun bool) error {
-	DnsCount += 1
+func (r *MockCFlare) AddIP(ipAddress string, dryRun bool) error {
+	DNSCount++
 	return nil
 }
 
-func (r *MockCFlare) RemoveIp(ipAddress string, dryRun bool) error {
-	DnsCount -= 1
+func (r *MockCFlare) RemoveIP(ipAddress string, dryRun bool) error {
+	DNSCount--
 	return nil
 }
 
@@ -48,15 +48,15 @@ func (r *MockCFlare) deleteDNSName(name string, ipAddress string) error {
 }
 
 func (r *MockCFlare) formatHostname(host string) string {
-	if strings.Contains(host, r.DnsDomain) {
+	if strings.Contains(host, r.DNSDomain) {
 		return host
 	}
-	return host + "." + r.DnsDomain
+	return host + "." + r.DNSDomain
 }
 
 func mockInitMaster(dnsConfig *MockCFlare, threshold int) {
 	Master.P = fastping.NewPinger()
-	Master.Dns = dnsConfig
+	Master.DNS = dnsConfig
 	Master.Mutex = &sync.RWMutex{}
 
 	Master.Results = make(map[string]*response)
@@ -74,7 +74,7 @@ func mockInitMaster(dnsConfig *MockCFlare, threshold int) {
 	Master.P.MaxRTT = 2 * time.Second
 }
 
-var DnsCount = 0
+var DNSCount = 0
 
 func mockConfigureCloudflare() (*MockCFlare, error) {
 	adds := []string{"52.52.52.52"}
@@ -95,9 +95,9 @@ func Test_handleTransition(t *testing.T) {
 		Gm.Clustered = false
 		mockInitMaster(dnsConfig, 3)
 		handleTransition("52.52.52.52", true)
-		So(DnsCount, ShouldEqual, 1)
+		So(DNSCount, ShouldEqual, 1)
 		handleTransition("52.52.52.52", false)
-		So(DnsCount, ShouldEqual, 0)
+		So(DNSCount, ShouldEqual, 0)
 	})
 
 }

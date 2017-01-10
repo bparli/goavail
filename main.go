@@ -18,7 +18,7 @@ func loadMonitor(configFile string, dryRun bool) {
 	if config.SlackAddr != "" {
 		notify.InitSlack(config.SlackAddr)
 	}
-	dnsConfig, err := dns.ConfigureCloudflare(config.DnsDomain, config.Proxied, config.Addresses, config.HostNames)
+	dnsConfig, err := dns.ConfigureCloudflare(config.DNSDomain, config.Proxied, config.Addresses, config.HostNames)
 	if err != nil {
 		log.Fatalln("Error initializing Cloudflare: ", err)
 	}
@@ -31,7 +31,7 @@ func loadMonitor(configFile string, dryRun bool) {
 		ipState.Gm.Peers = config.Peers
 		ipState.Gm.LocalAddr = config.LocalAddr
 		ipState.Gm.MinAgreement = config.MinPeersAgree
-		ipState.InitPeersIpViews()
+		ipState.InitPeersIPViews()
 		initMembersList(config.LocalAddr, config.Peers, config.MembersPort)
 	} else {
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
@@ -49,7 +49,7 @@ func loadMonitor(configFile string, dryRun bool) {
 func reloadMonitor(configFile string) {
 	config := parseConfig(configFile)
 
-	dnsConfig, err := dns.ConfigureCloudflare(config.DnsDomain, config.Proxied, config.Addresses, config.HostNames)
+	dnsConfig, err := dns.ConfigureCloudflare(config.DNSDomain, config.Proxied, config.Addresses, config.HostNames)
 	if err != nil {
 		log.Fatalln("Error initializing Cloudflare: ", err)
 
@@ -69,7 +69,7 @@ func reloadMonitor(configFile string) {
 		ipState.Gm.Clustered = false
 		ipState.Gm.Members.Shutdown()
 	}
-	ipState.Master.Dns = dnsConfig
+	ipState.Master.DNS = dnsConfig
 	ipState.Gm.Mutex.Unlock()
 
 	ipState.Master.Mutex.Lock()
@@ -92,6 +92,7 @@ func main() {
 	if *opts.Command == "monitor" {
 		loadMonitor(*opts.ConfigFile, *opts.DryRun)
 	}
+
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGHUP)
 	for {

@@ -14,10 +14,13 @@ type slackNotifications struct {
 	slackAddr string
 }
 
+//SlackNotify var for notifications to Slack
 var SlackNotify slackNotifications
 
+//Params for Slack
 type Params map[string]string
 
+//InitSlack  - initialize Slack
 func InitSlack(slackAddr string) {
 	if slackAddr != "" {
 		SlackNotify.UseSlack = true

@@ -1,6 +1,7 @@
 package dns
 
-type DnsProvider interface {
-	AddIp(ipAddress string, dryRun bool) error
-	RemoveIp(ipAddress string, dryRun bool) error
+//Provider interface for DNS service provider interface
+type Provider interface {
+	AddIP(ipAddress string, dryRun bool) error
+	RemoveIP(ipAddress string, dryRun bool) error
 }

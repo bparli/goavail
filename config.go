@@ -5,10 +5,11 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
+//GoavailConfig struct to capture config file parameters
 type GoavailConfig struct {
 	Addresses     []string `toml:"ip_addresses"`
 	Threshold     int      `toml:"failure_threshold"`
-	DnsDomain     string   `toml:"dns_domain"`
+	DNSDomain     string   `toml:"dns_domain"`
 	HostNames     []string `toml:"hostnames"`
 	Proxied       bool     `toml:"dns_proxied"`
 	Peers         []string `toml:"peers"`

@@ -13,12 +13,13 @@ import (
 	"github.com/tatsushid/go-fastping"
 )
 
+//Pingmon struct to manage monitoring agent context
 type Pingmon struct {
 	Results          map[string]*response
 	P                *fastping.Pinger
 	AddressFails     map[string]int
 	AddressSuccesses map[string]int
-	Dns              dns.DnsProvider
+	DNS              dns.Provider
 	Mutex            *sync.RWMutex
 }
 
@@ -27,11 +28,12 @@ type response struct {
 	rtt  time.Duration
 }
 
+//Master pinger
 var Master Pingmon
 
 func initMaster(dnsConfig *dns.CFlare, threshold int) {
 	Master.P = fastping.NewPinger()
-	Master.Dns = dnsConfig
+	Master.DNS = dnsConfig
 	Master.Mutex = &sync.RWMutex{}
 	Master.Results = make(map[string]*response)
 	Master.AddressFails = make(map[string]int)
@@ -48,6 +50,7 @@ func initMaster(dnsConfig *dns.CFlare, threshold int) {
 	Master.P.MaxRTT = 2 * time.Second
 }
 
+//StartPingMon to initialize and start ping monitor
 func StartPingMon(dnsConfig *dns.CFlare, threshold int) {
 	initMaster(dnsConfig, threshold)
 	onRecv, onIdle := make(chan *response), make(chan bool)
@@ -77,7 +80,7 @@ loop:
 				log.Infoln("IP Address ", res.addr.String(), " back in service")
 				handleTransition(res.addr.String(), true)
 			}
-			Master.AddressSuccesses[res.addr.String()] += 1
+			Master.AddressSuccesses[res.addr.String()]++
 			Master.AddressFails[res.addr.String()] = 0
 		case <-onIdle:
 			for ipAddr, r := range Master.Results {
@@ -86,7 +89,7 @@ loop:
 					if Master.AddressFails[ipAddr] == threshold {
 						handleTransition(ipAddr, false)
 					}
-					Master.AddressFails[ipAddr] += 1
+					Master.AddressFails[ipAddr]++
 					Master.AddressSuccesses[ipAddr] = 0
 				} else {
 					log.Debugln(ipAddr, ": ", r.rtt, " ", time.Now())

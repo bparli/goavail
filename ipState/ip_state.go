@@ -11,14 +11,15 @@ import (
 	"github.com/nitro/memberlist"
 )
 
-type peersIpStatus struct {
-	IpAddr  string
+type peersIPStatus struct {
+	IPAddr  string
 	IpsView map[string]bool
 }
 
+//GlobalMap struct for managing network of monitoring agents and monitored IPs
 type GlobalMap struct {
-	IpLive       map[string]bool           // true if an IP is still alive and false otherwise
-	peersIpView  map[string]*peersIpStatus //map of monitored IP addresses to each peers' views of them
+	IPLive       map[string]bool           // true if an IP is still alive and false otherwise
+	peersIPView  map[string]*peersIPStatus //map of monitored IP addresses to each peers' views of them
 	MinAgreement int
 	Mutex        *sync.RWMutex
 	Peers        []string
@@ -29,31 +30,33 @@ type GlobalMap struct {
 	CryptoKey    string
 }
 
-type HttpUpdate struct {
+//HTTPUpdate to manage peer monitoring agent updates
+type HTTPUpdate struct {
 	Peer      string
-	IpAddress string
+	IPAddress string
 	Live      bool
 }
 
+//Gm var for the global map of monitored IPs
 var Gm *GlobalMap
 
-//Initialize the Global Map struct
+//InitGM - initialize the Global Map struct
 func InitGM(ipAddresses []string, dryRun bool) {
 	m := make(map[string]bool)
 	for _, ip := range ipAddresses {
 		m[ip] = true
 	}
 
-	Gm = &GlobalMap{IpLive: m, Mutex: &sync.RWMutex{}, DryRun: dryRun}
+	Gm = &GlobalMap{IPLive: m, Mutex: &sync.RWMutex{}, DryRun: dryRun}
 }
 
-//Initialize the state of Peers' IP views to be true
-func InitPeersIpViews() {
-	Gm.peersIpView = make(map[string]*peersIpStatus)
-	for ipAddr, _ := range Gm.IpLive {
-		Gm.peersIpView[ipAddr] = &peersIpStatus{IpAddr: ipAddr, IpsView: make(map[string]bool)}
+//InitPeersIPViews - initialize the state of Peers' IP views to be true
+func InitPeersIPViews() {
+	Gm.peersIPView = make(map[string]*peersIPStatus)
+	for ipAddr := range Gm.IPLive {
+		Gm.peersIPView[ipAddr] = &peersIPStatus{IPAddr: ipAddr, IpsView: make(map[string]bool)}
 		for _, peer := range Gm.Peers {
-			Gm.peersIpView[ipAddr].IpsView[peer] = true
+			Gm.peersIPView[ipAddr].IpsView[peer] = true
 		}
 	}
 }
@@ -69,7 +72,7 @@ func notifyPeers(ipAddress string, live bool) error {
 
 	for _, peer := range Gm.Peers {
 		log.Debugln("Send update to peer:", peer)
-		upd := &HttpUpdate{Peer: LocalAddr, IpAddress: ipAddress, Live: live}
+		upd := &HTTPUpdate{Peer: LocalAddr, IPAddress: ipAddress, Live: live}
 		data, err := json.Marshal(upd)
 		if err != nil {
 			log.Errorln("Error Marshaling", err)
@@ -95,10 +98,10 @@ func notifyPeers(ipAddress string, live bool) error {
 	return nil
 }
 
-//Update ipstate in Peers' views based on http update
+//UpdateGlobalState - update ipstate in Peers' views based on http update
 func UpdateGlobalState(ipAddress string, live bool, peer string) (liveCheck int) {
 	Gm.Mutex.Lock()
-	Gm.peersIpView[ipAddress].IpsView[peer] = live
+	Gm.peersIPView[ipAddress].IpsView[peer] = live
 	liveCheck = checkGlobalState(ipAddress)
 	Gm.Mutex.Unlock()
 	return
@@ -106,29 +109,30 @@ func UpdateGlobalState(ipAddress string, live bool, peer string) (liveCheck int)
 
 func checkGlobalState(ipAddress string) (liveCheck int) {
 	liveCheck = 0
-	check := Gm.peersIpView[ipAddress]
+	check := Gm.peersIPView[ipAddress]
 	for _, v := range check.IpsView {
 		if v {
-			liveCheck += 1
+			liveCheck++
 		} else {
-			liveCheck -= 1
+			liveCheck--
 		}
 	}
 	return
 }
 
-func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
+//NotifyIPState - notify peer agents of change in state of monitored IP
+func NotifyIPState(ipAddress string, live bool, peerUpdate bool) error {
 	Gm.Mutex.RLock()
-	if Gm.IpLive[ipAddress] == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
+	if Gm.IPLive[ipAddress] == live && peerUpdate == true { //if we have seen the failure and received a notification from a peer that they've seen the failure
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
-			err := Master.Dns.RemoveIp(ipAddress, Gm.DryRun)
+			err := Master.DNS.RemoveIP(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := Master.Dns.AddIp(ipAddress, Gm.DryRun)
+			err := Master.DNS.AddIP(ipAddress, Gm.DryRun)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
@@ -136,7 +140,7 @@ func NotifyIpState(ipAddress string, live bool, peerUpdate bool) error {
 	} else if peerUpdate == false { //we haven't received a message from a peer yet so just update the state and notify peers
 		Gm.Mutex.RUnlock()
 		Gm.Mutex.Lock()
-		Gm.IpLive[ipAddress] = live
+		Gm.IPLive[ipAddress] = live
 		Gm.Mutex.Unlock()
 		log.Debugln("Notifying peers: ", ipAddress, live)
 		err := notifyPeers(ipAddress, live)
