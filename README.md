@@ -6,7 +6,8 @@ This personal project was done as part of Nitro Software's hack week.  We run ou
 
 These EIPs live in separate AZs, and since we're also proxying these EIPs through our CDN/DNS, this failover should be a matter of seconds.
 
-##Running
+Running
+--------------
 To run the agent first clone and build with Godep.  Then run the binary with the "monitor" command and specify the configuration file (default is goavail.toml).  The agent runs in "dry-run" mode by default.  Dry-run mode is totally passive and no DNS records can be updated.  For example: 
 
 ```bash
@@ -15,7 +16,8 @@ $ ./goavail monitor --config-file --no-dry-run goavail.toml
 ```
 The agent must be run as root user since its using raw socket for the ICMP.  Also see goavail.toml for a configration example
 
-##Cluster Mode
+Cluster Mode
+--------------
 Cluster mode uses a fork of the [memberlist library] (https://github.com/hashicorp/memberlist) to verify peers' health.  If a node sees an IP failure, it will notify its peers before invoking the DNS interface to take the failed IP out of the Pool.  A node will only remove an IP from the pool once its noted a failure and recieved confirmation from a peer.  
 
 To run in Cluster mode simply add the "peers" and "local_addr" entries in the toml file.  
@@ -24,7 +26,8 @@ Since running in cluster mode will likely mean the agents are running over the W
 
 The `min_peers_agree` setting is the minimum number of peers updates that must be received before an agent can perform an update on an A record.  So if `min_peers_agree = 1` and agent A sees an EIP is down, it must wait until it receives an update from at least one other peer also noting that same EIP as down.  Only then, can agent A take the EIP out of service.
 
-##Configuration File Settings
+Configuration File Settings
+-----------------------------------
 See goavail.toml for example settings
 * __ip_addresses__: The public IP addresses to be monitored
 * __failure_threshold__: Sensitivity to ping failures
@@ -37,5 +40,6 @@ See goavail.toml for example settings
 * __min_peers_agree__: if the agent detects a change (and the above failure_threshold), it will notify its peers.  It must receive agreement from at least min_peers_agree before the agent can take any action.  This is to reduce false positive likelihood.
 * __crypto_key__: optional setting to encrypt the payload in updates to peers.  Note this just sets the AES private key; the IV is hardcoded.
 
-##Reload 
+Reload 
+--------------
 The tool also supports configuration reload.  Simply send a SIGHUP signal to the process and it will reload the modified configuration file
