@@ -1,22 +1,29 @@
 package main
 
 import (
+	"time"
+
 	"github.com/BurntSushi/toml"
 	log "github.com/Sirupsen/logrus"
+	"github.com/bparli/goavail/dns"
 )
 
 //GoavailConfig struct to capture config file parameters
 type GoavailConfig struct {
-	Addresses     []string `toml:"ip_addresses"`
-	Threshold     int      `toml:"failure_threshold"`
-	DNSDomain     string   `toml:"dns_domain"`
-	HostNames     []string `toml:"hostnames"`
-	Proxied       bool     `toml:"dns_proxied"`
-	Peers         []string `toml:"peers"`
-	LocalAddr     string   `toml:"local_addr"`
-	SlackAddr     string   `toml:"slack_addr"`
+	Ports      []int         `toml:"ports"`
+	Threshold  int           `toml:"failure_threshold"`
+	SlackAddr  string        `toml:"slack_addr"`
+	Interval   time.Duration `toml:"interval"`
+	Members    MemberList
+	Route53    dns.Route53
+	Cloudflare dns.CloudFlare
+}
+
+type MemberList struct {
 	MembersPort   int      `toml:"members_port"`
 	MinPeersAgree int      `toml:"min_peers_agree"`
+	Peers         []string `toml:"peers"`
+	LocalAddr     string   `toml:"local_addr"`
 	CryptoKey     string   `toml:"crypto_key"`
 }
 

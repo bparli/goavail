@@ -4,4 +4,5 @@ package dns
 type Provider interface {
 	AddIP(ipAddress string, dryRun bool) error
 	RemoveIP(ipAddress string, dryRun bool) error
+	GetAddrs() []string
 }

@@ -11,6 +11,8 @@ type GoavailOpts struct {
 	ConfigFile *string
 	DryRun     *bool
 	Debug      *bool
+	Type       *string
+	DNS        *string
 }
 
 func parseCommandLine() *GoavailOpts {
@@ -22,6 +24,8 @@ func parseCommandLine() *GoavailOpts {
 	kingpin.Flag("laddr", "The port to listen for updates on from peers (Cluster mode only)").Short('l').Default("8081").String()
 	opts.DryRun = kingpin.Flag("dry-run", "Is this a dry run?").Short('d').Default("true").Bool()
 	opts.Debug = kingpin.Flag("debug", "Set for Debug mode").Short('b').Default("true").Bool()
+	opts.Type = kingpin.Flag("type", "Type of monitoring, ip (ping) or tcp based").Short('t').Default("ip").String()
+	opts.DNS = kingpin.Flag("dns-provider", "Set DNS Provider, either cloudflare or route53").Short('p').Default("cloudflare").String()
 
 	command := kingpin.Parse()
 	opts.Command = &command

@@ -27,25 +27,24 @@ func Init() {
 
 func Test_AddIP(t *testing.T) {
 	Convey("AddIp() should fail", t, func() {
-		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
-		err = cf.AddIP("127.0.0.1", true)
+		cf := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
+		err := cf.AddIP("127.0.0.1", true)
 		So(err, ShouldNotEqual, nil)
 	})
 }
 
 func Test_RemoveIP(t *testing.T) {
 	Convey("RemoveIp() should fail", t, func() {
-		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
-		err = cf.RemoveIP("127.0.0.1", true)
+		cf := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
+		err := cf.RemoveIP("127.0.0.1", true)
 		So(err, ShouldNotEqual, nil)
 	})
 }
 
 func Test_ConfigureCloudFlare(t *testing.T) {
 	Convey("ConfigureCloudFlare()", t, func() {
-		cf, err := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
+		cf := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
 
-		So(err, ShouldEqual, nil)
 		So(cf.DNSDomain, ShouldEqual, "testing.com")
 		So(cf.Proxied, ShouldEqual, true)
 		So(cf.Addresses[0], ShouldEqual, "127.0.0.1")
@@ -57,7 +56,7 @@ func Test_ConfigureCloudFlare(t *testing.T) {
 
 func Test_FormatHostnameCF(t *testing.T) {
 	Convey("formatHostname()", t, func() {
-		cf, _ := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1"}, []string{"beavis.dummy.com"})
+		cf := ConfigureCloudflare("testing.com", true, []string{"127.0.0.1"}, []string{"beavis.dummy.com"})
 
 		Convey("returns the right string when not including a domain", func() {
 			So(cf.formatHostname("shakespeare"), ShouldEqual, "shakespeare.testing.com")

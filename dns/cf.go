@@ -9,26 +9,25 @@ import (
 	"github.com/cloudflare/cloudflare-go"
 )
 
-//CFlare to maintain cloudflare addresses and domain in scope
-type CFlare struct {
-	DNSDomain string
-	Proxied   bool
-	Addresses []string
-	Hostnames []string
+//CloudFlare to maintain cloudflare addresses and domain in scope
+type CloudFlare struct {
+	DNSDomain string   `toml:"dns_domain"`
+	Proxied   bool     `toml:"dns_proxied"`
+	Addresses []string `toml:"ip_addresses"`
+	Hostnames []string `toml:"hostnames"`
 }
 
-//ConfigureCloudflare to initialize CFlare struct
-func ConfigureCloudflare(domain string, proxied bool, addresses []string, hostnames []string) (*CFlare, error) {
-	dnsConfig := CFlare{
-		domain,
-		proxied,
-		addresses,
-		hostnames}
-
-	return &dnsConfig, nil
+func (r *CloudFlare) GetAddrs() []string {
+	return r.Addresses
 }
 
-func (r *CFlare) formatHostname(host string) string {
+//ConfigureCloudflare to initialize CloudFlare struct
+func ConfigureCloudflare(domain string, proxied bool, addresses []string, hostnames []string) *CloudFlare {
+	log.Debugln("Addresses and Hostnames:", addresses, hostnames)
+	return &CloudFlare{domain, proxied, addresses, hostnames}
+}
+
+func (r *CloudFlare) formatHostname(host string) string {
 	if strings.Contains(host, r.DNSDomain) {
 		return host
 	}
@@ -36,7 +35,7 @@ func (r *CFlare) formatHostname(host string) string {
 }
 
 //AddIP to add IP back into cloudflare domain
-func (r *CFlare) AddIP(ipAddress string, dryRun bool) error {
+func (r *CloudFlare) AddIP(ipAddress string, dryRun bool) error {
 	for _, name := range r.Hostnames {
 		err := r.addDNSName(name, ipAddress, dryRun)
 		if err != nil {
@@ -46,7 +45,7 @@ func (r *CFlare) AddIP(ipAddress string, dryRun bool) error {
 	return nil
 }
 
-func (r *CFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
+func (r *CloudFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
 	// Construct a new API object
 	log.Infoln("Adding", name, ipAddress, "to Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))
@@ -93,7 +92,7 @@ func (r *CFlare) addDNSName(name string, ipAddress string, dryRun bool) error {
 }
 
 //RemoveIP to remove IP from Cloudflare domain
-func (r *CFlare) RemoveIP(ipAddress string, dryRun bool) error {
+func (r *CloudFlare) RemoveIP(ipAddress string, dryRun bool) error {
 	for _, name := range r.Hostnames {
 		err := r.deleteDNSName(name, ipAddress, dryRun)
 		if err != nil {
@@ -103,7 +102,7 @@ func (r *CFlare) RemoveIP(ipAddress string, dryRun bool) error {
 	return nil
 }
 
-func (r *CFlare) deleteDNSName(name string, ipAddress string, dryRun bool) error {
+func (r *CloudFlare) deleteDNSName(name string, ipAddress string, dryRun bool) error {
 	// Construct a new API object
 	log.Infoln("Deleting", name, ipAddress, "from Cloudflare")
 	api, err := cloudflare.New(os.Getenv("CF_API_KEY"), os.Getenv("CF_API_EMAIL"))

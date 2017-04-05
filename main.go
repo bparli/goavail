@@ -8,78 +8,102 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/dns"
-	"github.com/bparli/goavail/httpService"
-	"github.com/bparli/goavail/ipState"
+	checks "github.com/bparli/goavail/health_checks"
+	"github.com/bparli/goavail/http_service"
 	"github.com/bparli/goavail/notify"
 )
 
-func loadMonitor(configFile string, dryRun bool) {
-	config := parseConfig(configFile)
+func configDNS(config *GoavailConfig, dnsProvider string) dns.Provider {
+	var dnsConfig dns.Provider
+	if dnsProvider == "route53" {
+		log.Debugln("Using Route53 DNS provider")
+		if config.Route53.DNSDomain == "" {
+			log.Fatalln("No AWS Domain set")
+		}
+		r53 := dns.ConfigureRoute53(config.Route53.DNSDomain, config.Route53.AWSRegion, config.Route53.TTL,
+			config.Route53.AWSZoneID, config.Route53.Addresses, config.Route53.Hostnames)
+		dnsConfig = r53
+
+	} else {
+		log.Debugln("Using Cloudflare DNS provider")
+		if config.Cloudflare.DNSDomain == "" {
+			log.Fatalln("No Cloudflare Domain set")
+		}
+		cf := dns.ConfigureCloudflare(config.Cloudflare.DNSDomain, config.Cloudflare.Proxied, config.Cloudflare.Addresses, config.Cloudflare.Hostnames)
+		dnsConfig = cf
+	}
+	return dnsConfig
+}
+
+func loadMonitor(opts *GoavailOpts) {
+	config := parseConfig(*opts.ConfigFile)
 	if config.SlackAddr != "" {
 		notify.InitSlack(config.SlackAddr)
 	}
-	dnsConfig, err := dns.ConfigureCloudflare(config.DNSDomain, config.Proxied, config.Addresses, config.HostNames)
-	if err != nil {
-		log.Fatalln("Error initializing Cloudflare: ", err)
-	}
 
-	ipState.InitGM(config.Addresses, dryRun)
-	if len(config.Peers) > 0 && config.LocalAddr != "" {
-		go httpService.UpdatesListener(config.LocalAddr)
+	dnsConfig := configDNS(config, *opts.DNS)
+	addrs := dnsConfig.GetAddrs()
+
+	checks.InitGM(addrs, *opts.DryRun)
+	if len(config.Members.Peers) > 0 && config.Members.LocalAddr != "" {
+		go httpService.UpdatesListener(config.Members.LocalAddr)
 		log.Debugln("Running in Cluster mode")
-		ipState.Gm.Clustered = true
-		ipState.Gm.Peers = config.Peers
-		ipState.Gm.LocalAddr = config.LocalAddr
-		ipState.Gm.MinAgreement = config.MinPeersAgree
-		ipState.InitPeersIPViews()
-		initMembersList(config.LocalAddr, config.Peers, config.MembersPort)
+		checks.Gm.Clustered = true
+		checks.Gm.Peers = config.Members.Peers
+		checks.Gm.LocalAddr = config.Members.LocalAddr
+		checks.Gm.MinAgreement = config.Members.MinPeersAgree
+		checks.InitPeersIPViews()
+		initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
 	} else {
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
-		ipState.Gm.Clustered = false
+		checks.Gm.Clustered = false
 	}
 
-	if config.CryptoKey != "" {
-		ipState.Gm.CryptoKey = config.CryptoKey
+	if config.Members.CryptoKey != "" {
+		checks.Gm.CryptoKey = config.Members.CryptoKey
+	}
+	checks.Gm.Type = *opts.Type
+
+	checks.NewChecks(dnsConfig, config.Threshold, config.Interval, config.Ports)
+	if *opts.Type == "ip" {
+		log.Debugln("Running IP Ping monitor")
+		go checks.StartPingMon(config.Threshold)
+	} else if *opts.Type == "tcp" {
+		log.Debugln("Running TCP Health Checks monitor")
+		go checks.StartTCPChecks(config.Threshold)
 	}
 
-	log.Debugln(config)
-	go ipState.StartPingMon(dnsConfig, config.Threshold)
 }
 
-func reloadMonitor(configFile string) {
-	config := parseConfig(configFile)
+func reloadMonitor(opts *GoavailOpts) {
+	config := parseConfig(*opts.ConfigFile)
+	dnsConfig := configDNS(config, *opts.DNS)
 
-	dnsConfig, err := dns.ConfigureCloudflare(config.DNSDomain, config.Proxied, config.Addresses, config.HostNames)
-	if err != nil {
-		log.Fatalln("Error initializing Cloudflare: ", err)
-
-	}
-
-	ipState.Gm.Mutex.Lock()
-	if len(config.Peers) > 0 && config.LocalAddr != "" && ipState.Gm.Clustered == false { //if we aren't currently clustered but want to be
-		go httpService.UpdatesListener(config.LocalAddr)
+	checks.Gm.Mutex.Lock()
+	if len(config.Members.Peers) > 0 && config.Members.LocalAddr != "" && checks.Gm.Clustered == false { //if we aren't currently clustered but want to be
+		go httpService.UpdatesListener(config.Members.LocalAddr)
 		log.Debugln("Running in Cluster mode")
-		ipState.Gm.Clustered = true
-		ipState.Gm.Peers = config.Peers
-		ipState.Gm.LocalAddr = config.LocalAddr
-		ipState.Gm.MinAgreement = config.MinPeersAgree
-		initMembersList(config.LocalAddr, config.Peers, config.MembersPort)
-	} else if len(config.Peers) == 0 && config.LocalAddr == "" && ipState.Gm.Clustered == true { //if we are currently clustered but don't want to be
+		checks.Gm.Clustered = true
+		checks.Gm.Peers = config.Members.Peers
+		checks.Gm.LocalAddr = config.Members.LocalAddr
+		checks.Gm.MinAgreement = config.Members.MinPeersAgree
+		initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
+	} else if len(config.Members.Peers) == 0 && config.Members.LocalAddr == "" && checks.Gm.Clustered == true { //if we are currently clustered but don't want to be
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
-		ipState.Gm.Clustered = false
-		ipState.Gm.Members.Shutdown()
+		checks.Gm.Clustered = false
+		checks.Gm.Members.Shutdown()
 	}
-	ipState.Master.DNS = dnsConfig
-	ipState.Gm.Mutex.Unlock()
+	checks.Master.DNS = dnsConfig
+	checks.Gm.Mutex.Unlock()
 
-	ipState.Master.Mutex.Lock()
-	for _, ip := range dnsConfig.Addresses {
-		ipState.Master.Results[ip] = nil
-		ipState.Master.P.AddIP(ip)
-		ipState.Master.AddressFails[ip] = 0
-		ipState.Master.AddressSuccesses[ip] = 4 //initialize IPs such that they are already in service at start time
+	checks.Master.Mutex.Lock()
+	for _, ip := range dnsConfig.GetAddrs() {
+		checks.Master.Results[ip] = nil
+		checks.Master.P.AddIP(ip)
+		checks.Master.AddressFails[ip] = 0
+		checks.Master.AddressSuccesses[ip] = 4 //initialize IPs such that they are already in service at start time
 	}
-	ipState.Master.Mutex.Unlock()
+	checks.Master.Mutex.Unlock()
 	log.Debugln(config)
 }
 
@@ -89,15 +113,16 @@ func main() {
 	if *opts.Debug {
 		log.SetLevel(log.DebugLevel)
 	}
+
 	if *opts.Command == "monitor" {
-		loadMonitor(*opts.ConfigFile, *opts.DryRun)
+		loadMonitor(opts)
 	}
 
 	s := make(chan os.Signal, 1)
 	signal.Notify(s, syscall.SIGHUP)
 	for {
 		<-s
-		ipState.Master.P.Done()
-		reloadMonitor(*opts.ConfigFile)
+		checks.Master.P.Done()
+		reloadMonitor(opts)
 	}
 }
