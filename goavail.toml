@@ -1,10 +1,24 @@
-ip_addresses = ["52.52.52.52"]
-failure_threshold = 3
-dns_domain = "example.com"
-hostnames = ["test1", "test2", "test3"]
-dns_proxied = true
-peers = ["172.16.46.185:8081"]
-local_addr = "192.168.1.2:8081"
+failure_threshold = 5
+interval = 2
+ports = [8000, 80]
+
+[Members]
+peers = ["127.0.0.1:8082"]
+local_addr = "127.0.0.1:8081"
 members_port = 7947
 min_peers_agree = 1
 crypto_key = "1234567891012345"
+
+[Cloudflare]
+dns_proxied = false
+dns_domain = "example.com"
+hostnames = ["test"]
+ip_addresses = ["172.16.123.1"]
+
+[Route53]
+aws_domain = "example.com"
+hostnames = ["test"]
+ip_addresses = ["10.20.20.120", "127.0.0.1", "172.16.123.1"]
+ttl = 30
+aws_zoneid = "ZZZZZZZZZZZZZ"
+aws_region = "us-west-2"
