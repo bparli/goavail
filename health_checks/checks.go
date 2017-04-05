@@ -43,16 +43,6 @@ func NewChecks(dnsConfig dns.Provider, threshold int, interval time.Duration, po
 		Interval:         interval * time.Second,
 		Mutex:            &sync.RWMutex{}}
 
-	// var tcpAddrs []string
-	// if Gm.Type == "tcp" {
-	// 	for _, addr := range dnsConfig.GetAddrs() {
-	// 		for _, port := range ports {
-	// 			tcpAddrs = append(tcpAddrs, addr+":"+strconv.Itoa(port))
-	// 		}
-	// 	}
-	// }
-
-	//log.Debugln("TCP ADDRs: ", tcpAddrs, ports, Gm.Type)
 	for _, ip := range dnsConfig.GetAddrs() {
 		var tcpAddrs []string
 		Master.Results[ip] = nil

@@ -101,7 +101,7 @@ func reloadMonitor(opts *GoavailOpts) {
 		checks.Master.Results[ip] = nil
 		checks.Master.P.AddIP(ip)
 		checks.Master.AddressFails[ip] = 0
-		checks.Master.AddressSuccesses[ip] = 4 //initialize IPs such that they are already in service at start time
+		checks.Master.AddressSuccesses[ip] = config.Threshold + 1 //initialize IPs such that they are already in service at start time
 	}
 	checks.Master.Mutex.Unlock()
 	log.Debugln(config)

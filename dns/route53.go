@@ -24,11 +24,12 @@ func ConfigureRoute53(domain string, region string, ttl int64, zoneID string, ad
 	return &Route53{domain, region, ttl, zoneID, addresses, hostnames}
 }
 
+//GetAddrs returns the addresses in scope for monitoring purposes
 func (r *Route53) GetAddrs() []string {
 	return r.Addresses
 }
 
-func (r *Route53) GetRecords(hostname string) (*route53.ListResourceRecordSetsOutput, error) {
+func (r *Route53) getRecords(hostname string) (*route53.ListResourceRecordSetsOutput, error) {
 	svc := route53.New(session.New(), aws.NewConfig().WithRegion(r.AWSRegion))
 
 	params := &route53.ListResourceRecordSetsInput{
@@ -105,7 +106,7 @@ func (r *Route53) buildDNSChangeRequest(name string, ipAddress string, changeTyp
 	var recordSet *route53.ResourceRecordSet
 	setID := name
 
-	currRecords, err := r.GetRecords(name)
+	currRecords, err := r.getRecords(name)
 	if err != nil {
 		return nil, err
 	}

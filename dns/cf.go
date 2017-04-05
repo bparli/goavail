@@ -17,6 +17,7 @@ type CloudFlare struct {
 	Hostnames []string `toml:"hostnames"`
 }
 
+//GetAddrs returns the addresses in scope for monitoring purposes
 func (r *CloudFlare) GetAddrs() []string {
 	return r.Addresses
 }
