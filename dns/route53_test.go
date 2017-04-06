@@ -18,7 +18,7 @@ func Test_NewRoute53(t *testing.T) {
 	})
 }
 
-func TestDryRun(t *testing.T) {
+func Test_DryRun(t *testing.T) {
 	Convey("When in Dry Run Mode", t, func() {
 		r53 := ConfigureRoute53("example.com", "us-foo-1", 60, "zone-asdfasdf", []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
 
@@ -36,7 +36,7 @@ func TestDryRun(t *testing.T) {
 	})
 }
 
-func TestFormatHostname(t *testing.T) {
+func Test_FormatHostname(t *testing.T) {
 	Convey("formatHostname()", t, func() {
 		r53 := ConfigureRoute53("example.com", "us-foo-1", 60, "zone-asdfasdf", []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
 
@@ -47,5 +47,13 @@ func TestFormatHostname(t *testing.T) {
 		Convey("does not append an extra domain name", func() {
 			So(r53.formatHostname("shakespeare.example.com"), ShouldEqual, "shakespeare.example.com")
 		})
+	})
+}
+
+func Test_getHostedZoneID(t *testing.T) {
+	Convey("getHostedZoneID()", t, func() {
+		r53 := ConfigureRoute53("example.com", "eu-west-1", 60, "zone-asdfasdf", []string{"127.0.0.1", "127.0.0.2"}, []string{"beavis.dummy.com", "butthead.dummy.com"})
+		zid := r53.getHostedZoneID()
+		So(zid, ShouldEqual, "Z32O12XQLNTSW2")
 	})
 }

@@ -1,8 +1,13 @@
 package checks
 
 import (
+	"encoding/json"
+	"log"
+	"net/http"
 	"testing"
 
+	"github.com/bparli/goavail/encrypt"
+	"github.com/jarcoal/httpmock"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -58,5 +63,37 @@ func Test_UpdateGlobalState(t *testing.T) {
 		//Gm.peersIpView["52.52.52.52"].IpsView["192.168.1.10:80"] = false
 		liveCheck = UpdateGlobalState("52.52.52.52", false, "192.168.1.10:80")
 		So(liveCheck, ShouldEqual, 0)
+	})
+}
+
+func Test_PeerNotifications(t *testing.T) {
+	Convey("Test Peer Notification", t, func() {
+		httpmock.Activate()
+		defer httpmock.DeactivateAndReset()
+
+		httpmock.RegisterResponder("POST", "http://some.dummy.service:7979",
+			func(req *http.Request) (*http.Response, error) {
+				update := new(HTTPUpdate)
+				err := json.NewDecoder(req.Body).Decode(update)
+				if err != nil {
+					log.Fatal(err)
+				}
+				ipAddr := encrypt.Decrypt([]byte("example key 1234"), update.IPAddress)
+				So(ipAddr, ShouldEqual, "192.192.168.168")
+				So(update.Live, ShouldEqual, true)
+
+				resp, err := httpmock.NewJsonResponse(200, nil)
+				if err != nil {
+					return httpmock.NewStringResponse(500, ""), nil
+				}
+				return resp, nil
+			},
+		)
+
+		InitGM([]string{"192.192.168.168"}, true)
+		Gm.Peers = []string{"some.dummy.service:7979"}
+		Gm.CryptoKey = "example key 1234"
+		err := notifyPeers("192.192.168.168", true)
+		So(err, ShouldEqual, nil)
 	})
 }

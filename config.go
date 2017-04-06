@@ -19,6 +19,7 @@ type GoavailConfig struct {
 	Cloudflare dns.CloudFlare
 }
 
+//MemberList to capture the memberlist/cluster configurations
 type MemberList struct {
 	MembersPort   int      `toml:"members_port"`
 	MinPeersAgree int      `toml:"min_peers_agree"`
