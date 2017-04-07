@@ -15,7 +15,7 @@ func Test_newChecks(t *testing.T) {
 		InitGM([]string{"127.0.0.1", "127.0.0.2"}, false)
 		Gm.Type = "tcp"
 
-		NewChecks(r53, 5, 10, []int{80, 90, 100})
+		NewChecks(r53, 5, 10, 100)
 		So(Master.DNS, ShouldEqual, r53)
 		So(Master.Results["127.0.0.1"], ShouldEqual, nil)
 		So(Master.AddressFails["127.0.0.1"], ShouldEqual, 0)
@@ -45,13 +45,13 @@ func Test_tcpChecks(t *testing.T) {
 		InitGM([]string{"127.0.0.1"}, true)
 		Gm.Type = "tcp"
 
-		NewChecks(r53, 5, 10, []int{3000})
+		NewChecks(r53, 5, 10, 3000)
 		onSuccess, onFail := make(chan *response), make(chan *response)
 		go runTCPChecks("127.0.0.1:3000", onSuccess, onFail)
 		res := <-onSuccess
 		So(res.tcpAddr, ShouldEqual, "127.0.0.1:3000")
 
-		NewChecks(r53, 5, 10, []int{4000})
+		NewChecks(r53, 5, 10, 4000)
 		onSuccess2, onFail2 := make(chan *response), make(chan *response)
 		go runTCPChecks("127.0.0.1:4000", onSuccess2, onFail2)
 		res = <-onFail2

@@ -1,6 +1,6 @@
 failure_threshold = 5
 interval = 2
-ports = [8000, 80]
+port = 8000
 
 [Members]
 peers = ["127.0.0.1:8082"]

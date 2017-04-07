@@ -20,7 +20,7 @@ import (
 type HealthTracker struct {
 	Results          map[string]*response
 	P                *fastping.Pinger
-	TCPChecks        map[string][]string
+	TCPChecks        map[string]string
 	AddressFails     map[string]int
 	AddressSuccesses map[string]int
 	DNS              dns.Provider
@@ -32,28 +32,24 @@ type HealthTracker struct {
 var Master *HealthTracker
 
 //NewChecks initializes the *HealthTracker struct for health checks
-func NewChecks(dnsConfig dns.Provider, threshold int, interval time.Duration, ports []int) {
+func NewChecks(dnsConfig dns.Provider, threshold int, interval time.Duration, port int) {
 	Master = &HealthTracker{
 		P:                fastping.NewPinger(),
 		DNS:              dnsConfig,
 		Results:          make(map[string]*response),
 		AddressFails:     make(map[string]int),
 		AddressSuccesses: make(map[string]int),
-		TCPChecks:        make(map[string][]string),
+		TCPChecks:        make(map[string]string),
 		Interval:         interval * time.Second,
 		Mutex:            &sync.RWMutex{}}
 
 	for _, ip := range dnsConfig.GetAddrs() {
-		var tcpAddrs []string
 		Master.Results[ip] = nil
 		Master.P.AddIP(ip)
 		Master.AddressFails[ip] = 0
 		Master.AddressSuccesses[ip] = threshold + 1 //initialize IPs such that they are already in service at start time
 		if strings.Compare(Gm.Type, "tcp") == 0 {
-			for _, port := range ports {
-				tcpAddrs = append(tcpAddrs, ip+":"+strconv.Itoa(port))
-			}
-			Master.TCPChecks[ip] = tcpAddrs
+			Master.TCPChecks[ip] = ip + ":" + strconv.Itoa(port)
 		}
 	}
 }
@@ -61,10 +57,8 @@ func NewChecks(dnsConfig dns.Provider, threshold int, interval time.Duration, po
 //StartTCPChecks to run the registered tcp based health checks in separate goroutines
 func StartTCPChecks(threshold int) {
 	onSuccess, onFail := make(chan *response), make(chan *response)
-	for _, tcpAddrs := range Master.TCPChecks {
-		for _, tcpAddr := range tcpAddrs {
-			go runTCPChecks(tcpAddr, onSuccess, onFail)
-		}
+	for _, tcpAddr := range Master.TCPChecks {
+		go runTCPChecks(tcpAddr, onSuccess, onFail)
 	}
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt)

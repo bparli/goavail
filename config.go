@@ -10,7 +10,7 @@ import (
 
 //GoavailConfig struct to capture config file parameters
 type GoavailConfig struct {
-	Ports      []int         `toml:"ports"`
+	Port       int           `toml:"port"`
 	Threshold  int           `toml:"failure_threshold"`
 	SlackAddr  string        `toml:"slack_addr"`
 	Interval   time.Duration `toml:"interval"`

@@ -64,7 +64,7 @@ func loadMonitor(opts *GoavailOpts) {
 	}
 	checks.Gm.Type = *opts.Type
 
-	checks.NewChecks(dnsConfig, config.Threshold, config.Interval, config.Ports)
+	checks.NewChecks(dnsConfig, config.Threshold, config.Interval, config.Port)
 	if *opts.Type == "ip" {
 		log.Debugln("Running IP Ping monitor")
 		go checks.StartPingMon(config.Threshold)

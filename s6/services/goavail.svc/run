@@ -1,0 +1,5 @@
+#!/bin/sh
+exec 2>&1
+cd /bin
+echo -n "Starting Goavail"
+exec ./goavail monitor --no-dry-run -t tcp -p route53 -f /etc/goavail/goavail.toml
