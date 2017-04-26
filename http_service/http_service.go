@@ -3,6 +3,7 @@ package httpService
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
 	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/encrypt"
@@ -47,5 +48,14 @@ func recvNote(w http.ResponseWriter, r *http.Request) {
 func UpdatesListener(localAddr string) {
 	router := mux.NewRouter()
 	router.HandleFunc("/", recvNote)
-	http.ListenAndServe(localAddr, router)
+	err := http.ListenAndServe(localAddr, router)
+	if err != nil {
+		port := strings.Split(localAddr, ":")
+		log.Errorln("Error listening on ", localAddr, ".  Trying 0.0.0.0:", port[1])
+		err = http.ListenAndServe("0.0.0.0:"+string(port[1]), router)
+		if err != nil {
+			log.Fatalln("Unable to start Updates Listener on local port ", port[1])
+		}
+	}
+
 }

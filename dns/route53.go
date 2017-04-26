@@ -50,10 +50,10 @@ func (r *Route53) getRecords(hostname string) (*route53.ListResourceRecordSetsOu
 func (r *Route53) AddIP(ipAddress string, dryRun bool) error {
 	log.Debugln("DNS Configs: ", r.DNSDomain, r.Hostnames, r.Addresses)
 	if dryRun {
-		log.Infof(
-			"DNS: Would have ADDED IP address '%s' but it's a DRY RUN", ipAddress)
+		log.Infof("DNS: Would have ADDED IP address '%s' but it's a DRY RUN", ipAddress)
 		return nil
 	}
+	log.Infof("DNS: ADDING IP address '%s' ", ipAddress)
 	for _, name := range r.Hostnames {
 		err := r.runChange(name, ipAddress, "ADD")
 		if err != nil {
@@ -66,10 +66,10 @@ func (r *Route53) AddIP(ipAddress string, dryRun bool) error {
 //RemoveIP to remove IP back from Route53 zone
 func (r *Route53) RemoveIP(ipAddress string, dryRun bool) error {
 	if dryRun {
-		log.Infof(
-			"DNS: Would have DELETED IP address '%s' but it's a DRY RUN", ipAddress)
+		log.Infof("DNS: Would have DELETED IP address '%s' but it's a DRY RUN", ipAddress)
 		return nil
 	}
+	log.Infof("DNS: DELETING IP address '%s' ", ipAddress)
 	for _, name := range r.Hostnames {
 		err := r.runChange(name, ipAddress, "DELETE")
 		if err != nil {
