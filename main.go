@@ -79,30 +79,18 @@ func reloadMonitor(opts *GoavailOpts) {
 	dnsConfig := configDNS(config, *opts.DNS)
 
 	checks.Gm.Mutex.Lock()
-	if len(config.Members.Peers) > 0 && config.Members.LocalAddr != "" && checks.Gm.Clustered == false { //if we aren't currently clustered but want to be
-		go httpService.UpdatesListener(config.Members.LocalAddr)
-		log.Debugln("Running in Cluster mode")
-		checks.Gm.Clustered = true
-		checks.Gm.Peers = config.Members.Peers
-		checks.Gm.LocalAddr = config.Members.LocalAddr
-		checks.Gm.MinAgreement = config.Members.MinPeersAgree
-		initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
-	} else if len(config.Members.Peers) == 0 && config.Members.LocalAddr == "" && checks.Gm.Clustered == true { //if we are currently clustered but don't want to be
-		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
-		checks.Gm.Clustered = false
-		checks.Gm.Members.Shutdown()
-	}
-	checks.Master.DNS = dnsConfig
-	checks.Gm.Mutex.Unlock()
+	defer checks.Gm.Mutex.Unlock()
 
-	checks.Master.Mutex.Lock()
+	checks.Gm.MinAgreement = config.Members.MinPeersAgree
+
+	checks.Master.DNS = dnsConfig
+
 	for _, ip := range dnsConfig.GetAddrs() {
 		checks.Master.Results[ip] = nil
 		checks.Master.P.AddIP(ip)
 		checks.Master.AddressFails[ip] = 0
 		checks.Master.AddressSuccesses[ip] = config.Threshold + 1 //initialize IPs such that they are already in service at start time
 	}
-	checks.Master.Mutex.Unlock()
 	log.Debugln(config)
 }
 
