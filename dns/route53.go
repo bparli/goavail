@@ -3,10 +3,10 @@ package dns
 import (
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/route53"
+	log "github.com/sirupsen/logrus"
 )
 
 //Route53 to maintain Route53 addresses and domain in scope

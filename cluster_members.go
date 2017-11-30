@@ -3,9 +3,9 @@ package main
 import (
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	checks "github.com/bparli/goavail/health_checks"
-	"github.com/nitro/memberlist"
+	"github.com/hashicorp/memberlist"
+	log "github.com/sirupsen/logrus"
 )
 
 func initMembersList(localAddr string, peer []string, membersPort int) {

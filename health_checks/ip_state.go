@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"sync"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/encrypt"
-	"github.com/nitro/memberlist"
+	"github.com/hashicorp/memberlist"
+	log "github.com/sirupsen/logrus"
 )
 
 type peersIPStatus struct {

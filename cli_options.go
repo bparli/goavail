@@ -1,7 +1,7 @@
 package main
 
 import (
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"gopkg.in/alecthomas/kingpin.v2"
 )
 
@@ -21,7 +21,6 @@ func parseCommandLine() *GoavailOpts {
 	kingpin.CommandLine.Help = "A monitoring and DNS failover tool."
 	opts.ConfigFile = kingpin.Flag("config-file", "The configuration TOML file path").Short('f').Default("goavail.toml").String()
 	kingpin.Command("monitor", "Monitor set of Public IP Addresses in goavail.toml")
-	kingpin.Flag("laddr", "The port to listen for updates on from peers (Cluster mode only)").Short('l').Default("8081").String()
 	opts.DryRun = kingpin.Flag("dry-run", "Is this a dry run?").Short('d').Default("true").Bool()
 	opts.Debug = kingpin.Flag("debug", "Set for Debug mode").Short('b').Default("false").Bool()
 	opts.Type = kingpin.Flag("type", "Type of monitoring, ip (ping) or tcp based").Short('t').Default("ip").String()

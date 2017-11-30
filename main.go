@@ -3,14 +3,13 @@ package main
 import (
 	"os"
 	"os/signal"
-	"runtime"
 	"syscall"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/dns"
 	checks "github.com/bparli/goavail/health_checks"
 	"github.com/bparli/goavail/http_service"
 	"github.com/bparli/goavail/notify"
+	log "github.com/sirupsen/logrus"
 )
 
 func configDNS(config *GoavailConfig, dnsProvider string) dns.Provider {
@@ -108,7 +107,7 @@ func reloadMonitor(opts *GoavailOpts) {
 }
 
 func main() {
-	runtime.GOMAXPROCS(2)
+	//runtime.GOMAXPROCS(2)
 	opts := parseCommandLine()
 	if *opts.Debug {
 		log.SetLevel(log.DebugLevel)

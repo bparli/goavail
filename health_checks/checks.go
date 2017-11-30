@@ -11,8 +11,8 @@ import (
 	"syscall"
 	"time"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/dns"
+	log "github.com/sirupsen/logrus"
 	fastping "github.com/tatsushid/go-fastping"
 )
 

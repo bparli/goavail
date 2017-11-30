@@ -1,6 +1,6 @@
 package checks
 
-import log "github.com/Sirupsen/logrus"
+import log "github.com/sirupsen/logrus"
 
 //HandleTransition verifies neccessary peer agreement and takeks appropriate action
 func handleTransition(ipAddress string, live bool) {

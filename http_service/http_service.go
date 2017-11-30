@@ -5,10 +5,10 @@ import (
 	"net/http"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/encrypt"
 	checks "github.com/bparli/goavail/health_checks"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 )
 
 //HTTPUpdate struct to manage IP updates from peer monitoring agents

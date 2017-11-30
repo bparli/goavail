@@ -4,8 +4,8 @@ import (
 	"time"
 
 	"github.com/BurntSushi/toml"
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/dns"
+	log "github.com/sirupsen/logrus"
 )
 
 //GoavailConfig struct to capture config file parameters

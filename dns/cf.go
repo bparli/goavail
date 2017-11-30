@@ -4,9 +4,9 @@ import (
 	"os"
 	"strings"
 
-	log "github.com/Sirupsen/logrus"
 	"github.com/bparli/goavail/notify"
-	"github.com/cloudflare/cloudflare-go"
+	cloudflare "github.com/cloudflare/cloudflare-go"
+	log "github.com/sirupsen/logrus"
 )
 
 //CloudFlare to maintain cloudflare addresses and domain in scope
