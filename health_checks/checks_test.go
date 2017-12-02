@@ -26,7 +26,7 @@ func Test_newChecks(t *testing.T) {
 func Test_tcpChecks(t *testing.T) {
 	Convey("Verify TCP Health Checks", t, func() {
 		go func() {
-			l, err := net.Listen("tcp", ":3000")
+			l, err := net.Listen("tcp", "127.0.0.1:3000")
 			if err != nil {
 				t.Fatal(err)
 			}
