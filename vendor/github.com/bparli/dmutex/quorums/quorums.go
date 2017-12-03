@@ -10,13 +10,17 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
+type MemList struct {
+	*memberlist.Memberlist
+}
+
 type QState struct {
 	MyQuorums     map[int][]string // Ideal state of the local node's quorums when all nodes are healthy
 	MyCurrQuorums map[int][]string // Current state of the quorums.  Same as myQuorums when all nodes are healthy
 	mutex         *sync.RWMutex
 	fullTree      *bintree.Tree
 	currTree      *bintree.Tree
-	Mlist         *memberlist.Memberlist
+	Mlist         *MemList
 	CurrMembers   map[string]bool
 	CurrPeers     map[string]bool
 	localAddr     string
@@ -54,6 +58,7 @@ func NewQuorums(t *bintree.Tree, nodes []string, localAddr string) *QState {
 			count++
 		}
 	}
+
 	return &QState{
 		MyQuorums:     myQuorums,
 		MyCurrQuorums: myCurrQuorums,
@@ -64,6 +69,10 @@ func NewQuorums(t *bintree.Tree, nodes []string, localAddr string) *QState {
 		localAddr:     localAddr,
 		Ready:         false,
 		Healthy:       false}
+}
+
+func (q *QState) ExportMemberlist() interface{} {
+	return q.Mlist
 }
 
 // build the tree, but only from healthy members in the cluster

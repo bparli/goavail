@@ -129,6 +129,10 @@ func (d *Dmutex) Lock() error {
 		d.gateway.Lock()
 		defer d.gateway.Unlock()
 
+		if d.localRequest.Node != "" {
+			return errors.New("Dmutex Lock Error: outstanding lock detected")
+		}
+
 		ch := make(chan error, len(d.Quorums.CurrMembers))
 		var wg sync.WaitGroup
 		args := &queue.Mssg{
@@ -162,6 +166,7 @@ func (d *Dmutex) Lock() error {
 			return err
 		case <-time.After(server.Timeout):
 			// try to recover after a timeout to prevent getting into a cluster-wide timeout loop
+			d.localRequest = &queue.Mssg{}
 			server.PurgeNodeFromQueue(nodeAddr)
 			d.rpcServer.SanitizeQueue()
 			d.rpcServer.TriggerQueueProcess()
@@ -175,6 +180,10 @@ func (d *Dmutex) UnLock() error {
 	d.gateway.Lock()
 	defer d.gateway.Unlock()
 
+	if d.localRequest.Node == "" {
+		return errors.New("Dmutex Unlock Error: no outstanding lock detected")
+	}
+
 	ch := make(chan error, len(d.Quorums.CurrMembers))
 
 	args := d.localRequest
@@ -183,6 +192,7 @@ func (d *Dmutex) UnLock() error {
 	err := d.checkForError(ch)
 
 	close(ch)
+	d.localRequest = &queue.Mssg{}
 	return err
 }
 

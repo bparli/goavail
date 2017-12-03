@@ -45,6 +45,7 @@ func ChangeIP(ipAddress string, dryRun bool, op int) error {
 	var err error
 
 	if Gm.Clustered {
+		log.Debugln("Acquiring distributed lock")
 		if err = Gm.Dmutex.Lock(); err != nil {
 			return errors.New("Error acquiring distributed lock: " + err.Error())
 		} else {
@@ -52,13 +53,16 @@ func ChangeIP(ipAddress string, dryRun bool, op int) error {
 		}
 	}
 
+	log.Debugln("Cloudflare API: " + ipAddress)
 	if op == ADD {
+		log.Infoln("ADDING TEST")
 		err = Master.DNS.AddIP(ipAddress, dryRun)
 	} else if op == REMOVE {
 		err = Master.DNS.RemoveIP(ipAddress, dryRun)
 	}
 
 	if Gm.Clustered {
+		log.Debugln("Releasing distributed lock")
 		// if we get to this point don't return an error unless the actual update call above
 		// throws an error. But still log it
 		if errUnlock := Gm.Dmutex.UnLock(); errUnlock != nil {

@@ -67,7 +67,7 @@ func loadMonitor(opts *GoavailOpts) {
 		// members input to dmutex must be the full list, not just peers
 		members = append(members, localIP)
 
-		dm := dmutex.NewDMutex(localIP, members, 6*time.Second)
+		dm := dmutex.NewDMutex(localIP, members, time.Duration(3*len(members))*time.Second)
 		exportedMemberlist := dm.Quorums.ExportMemberlist()
 		mems, ok := exportedMemberlist.(*quorums.MemList)
 		if !ok {
@@ -76,7 +76,6 @@ func loadMonitor(opts *GoavailOpts) {
 		checks.Gm.Members = mems
 
 		checks.Gm.Dmutex = dm
-		//initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
 	} else {
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
 		checks.Gm.Clustered = false

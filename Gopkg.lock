@@ -28,14 +28,14 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/route53","service/sts"]
-  revision = "83e491e1ee74c797ee52c228b654601ba6702c31"
-  version = "v1.12.37"
+  revision = "388e6676807f5968ad5eaaec0c70002f80c20b84"
+  version = "v1.12.39"
 
 [[projects]]
   branch = "master"
   name = "github.com/bparli/dmutex"
   packages = [".","bintree","queue","quorums","server"]
-  revision = "d79294d4b721cc23cfa3e84959b5aff553f9f165"
+  revision = "c582438be63ae6516048bc5b888330eb9534eefd"
 
 [[projects]]
   name = "github.com/cloudflare/cloudflare-go"
@@ -184,7 +184,7 @@
   branch = "master"
   name = "golang.org/x/sys"
   packages = ["unix","windows"]
-  revision = "13fcbd661c8ececa8807a29b48407d674b1d8ed8"
+  revision = "8b4580aae2a0dd0c231a45d3ccb8434ff533b840"
 
 [[projects]]
   name = "gopkg.in/alecthomas/kingpin.v2"
@@ -195,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "f014556ad770310a5a9247a1f579ee0cf3c06671034dcb8147b366f24d55ba82"
+  inputs-digest = "4bb753adfa2968c8aa43669e259256e7aa72f11093d9bc0a91afe37efec0b1a6"
   solver-name = "gps-cdcl"
   solver-version = 1
