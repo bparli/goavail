@@ -3,8 +3,12 @@ package main
 import (
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
+	"time"
 
+	"github.com/bparli/dmutex"
+	"github.com/bparli/dmutex/quorums"
 	"github.com/bparli/goavail/dns"
 	checks "github.com/bparli/goavail/health_checks"
 	"github.com/bparli/goavail/http_service"
@@ -52,7 +56,27 @@ func loadMonitor(opts *GoavailOpts) {
 		checks.Gm.LocalAddr = config.Members.LocalAddr
 		checks.Gm.MinAgreement = config.Members.MinPeersAgree
 		checks.InitPeersIPViews()
-		initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
+
+		// extract only IPs for dmutex memberlist
+		var members []string
+		for _, member := range config.Members.Peers {
+			ipAddr := strings.Split(member, ":")[0]
+			members = append(members, ipAddr)
+		}
+		localIP := strings.Split(config.Members.LocalAddr, ":")[0]
+		// members input to dmutex must be the full list, not just peers
+		members = append(members, localIP)
+
+		dm := dmutex.NewDMutex(localIP, members, 6*time.Second)
+		exportedMemberlist := dm.Quorums.ExportMemberlist()
+		mems, ok := exportedMemberlist.(*quorums.MemList)
+		if !ok {
+			log.Fatalln("Unable to initialize dmutex and memberlist")
+		}
+		checks.Gm.Members = mems
+
+		checks.Gm.Dmutex = dm
+		//initMembersList(config.Members.LocalAddr, config.Members.Peers, config.Members.MembersPort)
 	} else {
 		log.Debugln("Running in Single Node mode.  Need local_addr and peers to be set to run in Cluster Mode")
 		checks.Gm.Clustered = false
@@ -71,7 +95,6 @@ func loadMonitor(opts *GoavailOpts) {
 		log.Debugln("Running TCP Health Checks monitor")
 		go checks.StartTCPChecks(config.Threshold)
 	}
-
 }
 
 func reloadMonitor(opts *GoavailOpts) {

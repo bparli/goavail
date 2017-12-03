@@ -107,5 +107,4 @@ func Test_handleTransition(t *testing.T) {
 		handleTransition("52.52.52.52", false)
 		So(DNSCount, ShouldEqual, 0)
 	})
-
 }

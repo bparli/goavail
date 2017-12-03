@@ -32,6 +32,12 @@
   version = "v1.12.37"
 
 [[projects]]
+  branch = "master"
+  name = "github.com/bparli/dmutex"
+  packages = [".","bintree","queue","quorums","server"]
+  revision = "d79294d4b721cc23cfa3e84959b5aff553f9f165"
+
+[[projects]]
   name = "github.com/cloudflare/cloudflare-go"
   packages = ["."]
   revision = "da8999bdb24a34c4a82a119d184f8336a979b215"
@@ -189,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "85b56e6306d56876429b57dca7c5c3c89af7c490ea06d954e1a7504f2bbf392a"
+  inputs-digest = "f014556ad770310a5a9247a1f579ee0cf3c06671034dcb8147b366f24d55ba82"
   solver-name = "gps-cdcl"
   solver-version = 1

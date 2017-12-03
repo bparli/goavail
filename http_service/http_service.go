@@ -54,7 +54,7 @@ func UpdatesListener(localAddr string) {
 		log.Errorln("Error listening on ", localAddr, ".  Trying 0.0.0.0:", port[1])
 		err = http.ListenAndServe("0.0.0.0:"+string(port[1]), router)
 		if err != nil {
-			log.Fatalln("Unable to start Updates Listener on local port ", port[1])
+			log.Fatalln("Unable to start Updates Listener on local port ", port[1], err)
 		}
 	}
 

@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"sync"
 
+	"github.com/bparli/dmutex"
+	"github.com/bparli/dmutex/quorums"
 	"github.com/bparli/goavail/encrypt"
-	"github.com/hashicorp/memberlist"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -25,10 +26,11 @@ type GlobalMap struct {
 	Peers        []string
 	LocalAddr    string
 	Clustered    bool
-	Members      *memberlist.Memberlist
+	Members      *quorums.MemList
 	DryRun       bool
 	CryptoKey    string
 	Type         string
+	Dmutex       *dmutex.Dmutex
 }
 
 //HTTPUpdate to manage peer monitoring agent updates
@@ -48,7 +50,12 @@ func InitGM(ipAddresses []string, dryRun bool) {
 		m[ip] = true
 	}
 
-	Gm = &GlobalMap{IPLive: m, Mutex: &sync.RWMutex{}, DryRun: dryRun}
+	Gm = &GlobalMap{
+		IPLive: m,
+		Mutex:  &sync.RWMutex{},
+		DryRun: dryRun,
+		Dmutex: &dmutex.Dmutex{},
+	}
 }
 
 //InitPeersIPViews - initialize the state of Peers' IP views to be true
@@ -128,12 +135,14 @@ func NotifyIPState(ipAddress string, live bool, peerUpdate bool) error {
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
-			err := Master.DNS.RemoveIP(ipAddress, Gm.DryRun)
+			//err := Master.DNS.RemoveIP(ipAddress, Gm.DryRun)
+			err := ChangeIP(ipAddress, Gm.DryRun, REMOVE)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := Master.DNS.AddIP(ipAddress, Gm.DryRun)
+			//err := Master.DNS.AddIP(ipAddress, Gm.DryRun)
+			err := ChangeIP(ipAddress, Gm.DryRun, ADD)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}
