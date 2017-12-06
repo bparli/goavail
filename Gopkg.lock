@@ -28,14 +28,14 @@
 [[projects]]
   name = "github.com/aws/aws-sdk-go"
   packages = ["aws","aws/awserr","aws/awsutil","aws/client","aws/client/metadata","aws/corehandlers","aws/credentials","aws/credentials/ec2rolecreds","aws/credentials/endpointcreds","aws/credentials/stscreds","aws/defaults","aws/ec2metadata","aws/endpoints","aws/request","aws/session","aws/signer/v4","internal/shareddefaults","private/protocol","private/protocol/query","private/protocol/query/queryutil","private/protocol/rest","private/protocol/restxml","private/protocol/xml/xmlutil","service/route53","service/sts"]
-  revision = "388e6676807f5968ad5eaaec0c70002f80c20b84"
-  version = "v1.12.39"
+  revision = "107df09c5f137b9dfe53b7a4c25dd4d79f81390f"
+  version = "v1.12.40"
 
 [[projects]]
   branch = "master"
   name = "github.com/bparli/dmutex"
   packages = [".","bintree","queue","quorums","server"]
-  revision = "c582438be63ae6516048bc5b888330eb9534eefd"
+  revision = "769e09aa5daff13b0210c6862c770ae1d3d17c8f"
 
 [[projects]]
   name = "github.com/cloudflare/cloudflare-go"
@@ -89,7 +89,7 @@
   branch = "master"
   name = "github.com/hashicorp/go-multierror"
   packages = ["."]
-  revision = "83588e72410abfbe4df460eeb6f30841ae47d4c4"
+  revision = "b7773ae218740a7be65057fc60b366a49b538a44"
 
 [[projects]]
   branch = "master"
@@ -129,8 +129,8 @@
 [[projects]]
   branch = "master"
   name = "github.com/miekg/dns"
-  packages = [".","internal/socket"]
-  revision = "6da3249dfb57fbaa16efafcd8744cee8809d80cd"
+  packages = ["."]
+  revision = "325e98bb8641b89fa2b1542149b09ec670953ac4"
 
 [[projects]]
   name = "github.com/pkg/errors"
@@ -195,6 +195,6 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "4bb753adfa2968c8aa43669e259256e7aa72f11093d9bc0a91afe37efec0b1a6"
+  inputs-digest = "e0bc35106bd96534a35462e9ed1289f0bf6ab2c3656d6339eb85ff92c4118da0"
   solver-name = "gps-cdcl"
   solver-version = 1
