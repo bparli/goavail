@@ -135,12 +135,12 @@ func NotifyIPState(ipAddress string, live bool, peerUpdate bool) error {
 		Gm.Mutex.RUnlock()
 		log.Debugln("Received agreement from Peer.  Updating IP Pool")
 		if live == false {
-			err := UpdateDNSRec(ipAddress, Gm.DryRun, REMOVE)
+			err := updateDNSRec(ipAddress, Gm.DryRun, REMOVE)
 			if err != nil {
 				log.Errorln("Error Removing IP: ", ipAddress, err)
 			}
 		} else {
-			err := UpdateDNSRec(ipAddress, Gm.DryRun, ADD)
+			err := updateDNSRec(ipAddress, Gm.DryRun, ADD)
 			if err != nil {
 				log.Errorln("Error Adding IP: ", ipAddress, err)
 			}

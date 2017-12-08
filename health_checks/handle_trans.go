@@ -25,14 +25,12 @@ func handleTransition(ipAddress string, live bool) {
 		} else {
 			log.Debugln("Running in single mode, updating DNS")
 			if live == true {
-				//err := Master.DNS.AddIP(ipAddress, Gm.DryRun)
-				err := UpdateDNSRec(ipAddress, Gm.DryRun, ADD)
+				err := updateDNSRec(ipAddress, Gm.DryRun, ADD)
 				if err != nil {
 					log.Errorln("Error Adding IP: ", ipAddress, err)
 				}
 			} else {
-				//err := Master.DNS.RemoveIP(ipAddress, Gm.DryRun)
-				err := UpdateDNSRec(ipAddress, Gm.DryRun, REMOVE)
+				err := updateDNSRec(ipAddress, Gm.DryRun, REMOVE)
 				if err != nil {
 					log.Errorln("Error Removing IP: ", ipAddress, err)
 				}
@@ -41,7 +39,7 @@ func handleTransition(ipAddress string, live bool) {
 	}
 }
 
-func UpdateDNSRec(ipAddress string, dryRun bool, op int) error {
+func updateDNSRec(ipAddress string, dryRun bool, op int) error {
 	var err error
 
 	if Gm.Clustered {
