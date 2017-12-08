@@ -26,13 +26,13 @@ func handleTransition(ipAddress string, live bool) {
 			log.Debugln("Running in single mode, updating DNS")
 			if live == true {
 				//err := Master.DNS.AddIP(ipAddress, Gm.DryRun)
-				err := ChangeIP(ipAddress, Gm.DryRun, ADD)
+				err := UpdateDNSRec(ipAddress, Gm.DryRun, ADD)
 				if err != nil {
 					log.Errorln("Error Adding IP: ", ipAddress, err)
 				}
 			} else {
 				//err := Master.DNS.RemoveIP(ipAddress, Gm.DryRun)
-				err := ChangeIP(ipAddress, Gm.DryRun, REMOVE)
+				err := UpdateDNSRec(ipAddress, Gm.DryRun, REMOVE)
 				if err != nil {
 					log.Errorln("Error Removing IP: ", ipAddress, err)
 				}
@@ -41,7 +41,7 @@ func handleTransition(ipAddress string, live bool) {
 	}
 }
 
-func ChangeIP(ipAddress string, dryRun bool, op int) error {
+func UpdateDNSRec(ipAddress string, dryRun bool, op int) error {
 	var err error
 
 	if Gm.Clustered {
@@ -53,9 +53,7 @@ func ChangeIP(ipAddress string, dryRun bool, op int) error {
 		}
 	}
 
-	log.Debugln("Cloudflare API: " + ipAddress)
 	if op == ADD {
-		log.Infoln("ADDING TEST")
 		err = Master.DNS.AddIP(ipAddress, dryRun)
 	} else if op == REMOVE {
 		err = Master.DNS.RemoveIP(ipAddress, dryRun)
